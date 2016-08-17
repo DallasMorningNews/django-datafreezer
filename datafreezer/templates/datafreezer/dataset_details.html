@@ -1,0 +1,94 @@
+{% extends 'datafreezer/base.html' %}
+
+<!--Header container-->
+{% block title %}{{ dataset.title }}{% endblock title %}
+
+{% block content %}
+
+  <!-- Begin descriptor row -->
+  <div class="container-fluid">
+    <!-- Row begins -->
+    <div class="row-fluid">
+      <div class="col-sm-6">
+        <p class="lead">{{ dataset.description }}</p>
+      </div>
+      <!--Basic meta information-->
+      <div class="col-sm-6">
+        <dl class="dl-horizontal">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              {% if dataset.date_begin != None and dataset.date_end != None %}
+                <dt>Date range</dt>
+                <dd>{{ dataset.date_begin|date:"N d, Y" }} - {{ dataset.date_end|date:"N d, Y" }}</dd>
+              {% endif %}
+              <dt>Date uploaded</dt>
+              <dd>{{ dataset.date_uploaded }}</dd>
+              <dt>Uploaded by</dt>
+              <dd><a href="{% url 'datafreezer_author_detail' dataset.uploaded_by %}">{{ uploader_name }}</a></dd>
+              <dt>Vertical</dt>
+              <dd><a href="#">{{ dataset.vertical }}</a></dd>
+              <dt>Hub</dt>
+              <dd><a href="#">{{ dataset.hub }}</a></dd>
+              <dt>Tags</dt>
+              {% for tag in tags %}
+                <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>
+              {% endfor %}
+            </div>
+          </div>
+        </dl>
+      </div>
+      <!--End basic meta information-->
+    </div>
+    <!-- End row -->
+  </div>
+  <!-- End descriptor row -->
+
+<!--Data dictionary information-->
+<div class="container-fluid">
+  <div class="col-sm-12">
+    <h4>Data Dictionary <small>What's in this dataset?</small></h4>
+  </div>
+  <table class="table table-hover">
+    <tbody>
+      <th>Heading</th>
+      <th>Description</th>
+      <th>Data Type</th>
+        {% for field in datadict %}
+          <tr>
+            <td>{{ field.heading }}</td>
+            <td>{{ field.description }}</td>
+            <td>{{ field.dataType }}</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+</div>
+<!--End data dictionary information-->
+
+<!--Article listing-->
+{% if articles %}
+<div class="container-fluid">
+  <div class="col-sm-12">
+    <h4>Articles <small>Where has this data been sourced?</small></h4>
+  </div>
+    <table class="table table-hover">
+      <tbody>
+        <th>Title</th>
+        <th>Hyperlink</th>
+        {% for article in articles %}
+          <tr>
+            <td>{{ article.title }}</td>
+            <td>
+                <a href="{{ article.url }}" class="btn btn-primary btn-block" role="button">
+                  <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
+                </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+<!--End article listing-->
+{% endblock content %}

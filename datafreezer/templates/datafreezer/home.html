@@ -1,0 +1,123 @@
+{%extends 'datafreezer/base.html'%}
+{%load staticfiles%}
+{%block custom_meta%}
+
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<meta content="" name="description" />
+<title></title>
+<meta property="og:url" content="" />
+<meta property="og:title" content="" />
+<meta property="og:description" content="" name="description" />
+<meta property="og:image" content="" />
+<meta property="og:image:height" content="" />
+<meta property="og:image:width" content="" />
+<meta property="og:type" content="article" />
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@" />
+<meta name="twitter:creator" content="@" />
+
+<meta name="liveFyreID" content="" />
+
+<meta name="parsely-page" id='parsely-page' content='{"title": "", "link": "", "image_url": "", "type": "post", "post_id": "", "pub_date": "", "section": "", "author": [""], "tags": [""]}' />
+
+<meta property="og:keywords" content="" />
+
+<meta name="news_keywords" content="" />
+{%endblock%}
+{%block custom_head%}
+<link rel="stylesheet" type="text/x-scss" href="{% static 'datafreezer/css/styles.scss' %}" />
+{%endblock%}
+{%block ad%}
+<script type="text/javascript" src="http://www.googletagservices.com/tag/js/gpt.js"></script>
+<script type="text/javascript">
+    DFP_networkId = "11222444";
+    var DFPSlotSizes = [];
+    if (jQuery(window).width() < 768) {
+        var DFP_sitepage = "m.DMN/interactives";
+        DFPSlotSizes = [320, 50]
+        var adSlot0 = googletag.defineSlot('/' + DFP_networkId + '/' + DFP_sitepage, DFPSlotSizes, "dfpAdPositionTop");
+        adSlot0.setTargeting("position", "x01");
+        adSlot0.addService(googletag.pubads());
+        /*
+        var adSlot1 = googletag.defineSlot('/' + DFP_networkId + '/' + DFP_sitepage, DFPSlotSizes, "dfpAdPositionMiddle");
+        adSlot1.setTargeting("position", "x02");
+        adSlot1.addService(googletag.pubads());
+        */
+        /*
+        var adSlot2 = googletag.defineSlot('/' + DFP_networkId + '/' + DFP_sitepage, DFPSlotSizes, "dfpAdPositionBottom");
+        adSlot2.setTargeting("position", "x03");
+        adSlot2.addService(googletag.pubads());
+        */
+    } else {
+        var DFP_sitepage = "DMN/interactives";
+        DFPSlotSizes = [728, 90]
+        var adSlot0 = googletag.defineSlot('/' + DFP_networkId + '/' + DFP_sitepage, DFPSlotSizes, "dfpAdPositionTop");
+        adSlot0.setTargeting("position", "Top");
+        adSlot0.addService(googletag.pubads());
+        /*
+        var adSlot1 = googletag.defineSlot('/' + DFP_networkId + '/' + DFP_sitepage, DFPSlotSizes, "dfpAdPositionMiddle");
+        adSlot1.setTargeting("position", "Top");
+        adSlot1.addService(googletag.pubads());
+        */
+        /*
+        var adSlot2 = googletag.defineSlot('/' + DFP_networkId + '/' + DFP_sitepage, DFPSlotSizes, "dfpAdPositionBottom");
+        adSlot2.setTargeting("position", "Top");
+        adSlot2.addService(googletag.pubads());
+        */
+    }
+</script>
+<script type="text/javascript">
+    googletag.pubads().enableSingleRequest();
+    googletag.pubads().enableSyncRendering();
+    googletag.enableServices();
+</script>
+{%endblock%}
+
+  {% block title %}{{ heading }}{% endblock title %}
+  {%block content%}
+  <div class="table-responsive">
+    <table class='table table-hover'>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Date Uploaded</th>
+          <th>Uploader</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for upload in recent_uploads %}
+          <tr>
+            <td>{{ upload.title }}</td>
+            <td>{{ upload.date_uploaded }}</td>
+            <td>{{ upload.fullName }}</td>
+            <td>
+              <a href="{% url 'datafreezer_dataset_detail' upload.id %}" class="btn btn-primary btn-block" role="button">
+                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+              </a>
+          </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {%endblock content%}
+{%block custom_foot%}
+<script type="text/javascript"></script>
+{%endblock%}
+{%block custom_social_meta%}
+<script type="text/javascript">
+    var storyTitle = "",
+        storyURL = "",
+        leadText = "",
+        storyIMG = "",
+        storyAuthor = "",
+        twitterTag = "",
+        comments = true,
+        share = true;
+    OAS_sitepage = 'www.dallasnews.com/';
+</script>
+{%endblock%}

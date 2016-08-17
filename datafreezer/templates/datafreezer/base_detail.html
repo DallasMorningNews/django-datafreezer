@@ -1,0 +1,66 @@
+{% extends 'datafreezer/base.html' %}
+
+<!--Header container-->
+{% block title %}{% endblock title %}
+
+{% block content %}
+
+  <!-- Begin descriptor row -->
+  <div class="container-fluid">
+    <!-- Row begins -->
+    {% if datasets|length > 0 %}
+    <div class="row-fluid">
+      <div class="col-sm-6">
+        {% block description_text %}
+        {% endblock description_text %}
+      </div>
+      <!--Basic meta information-->
+      <div class="col-sm-6">
+        <dl class="dl-horizontal">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              {% block meta_panel %}
+              {% endblock meta_panel %}
+            </div>
+          </div>
+        </dl>
+      </div>
+      <!--End basic meta information-->
+    </div>
+    <!-- End row -->
+    {% block datasets_display %}
+    <div class="row-fluid">
+      <div class="col-md-12">
+        <h4>{% block dataset_table_header %}Dataset Uploads{% endblock dataset_table_header %}</h4>
+      </div>
+    </div>
+    {% for dataset in datasets %}
+    <div class="row-fluid">
+      <div class="col-md-12">
+        <a href="{% url 'datafreezer_dataset_detail' dataset.id %}">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <div class="row-fluid">
+                {% block dataset_info %}
+                {% endblock dataset_info %}
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+    {% endfor %}
+    {% endblock datasets_display %}
+  </div>
+  <!-- End descriptor row -->
+  {% else %}
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="col-md-12">
+          <h4>{% block empty_page_text %}{% endblock empty_page_text %}</h4>
+        </div>
+      </div>
+    </div>
+    <br>
+  {% endif %}
+{% endblock content %}

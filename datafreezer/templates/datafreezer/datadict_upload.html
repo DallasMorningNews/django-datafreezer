@@ -1,0 +1,209 @@
+{% extends 'datafreezer/base.html' %}
+  {% block title %}{{ title }}{% endblock title %}
+
+  {% block content %}
+  <p class="lead text-muted">Lead help text.Lead help text.Lead help text.Lead help text.</p>
+  <form class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ fieldsFormset.media }}
+
+    {{ fieldsFormset.management_form }}
+
+    {% if hasHeaders %}
+
+      {% for fieldForm in fieldsFormset %}
+        <fieldset>
+        {{ fieldForm.non_field_errors }}
+        {% for field in fieldForm %}
+          <div class="form-group {%if field.errors %}has-errors{%endif%}">
+            {% if field.errors %}
+              <div class="control-group alert alert-dismissible alert-danger">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <ul class="errorlist">
+                  {% for error in field.errors %}
+                    <li><strong>{{ error|escape }}</strong></li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            <label class="col-sm-2 control-label" for="{{ field.name }}">
+              {{ field.label }}
+            </label>
+            <div class="col-sm-10">
+              {{ field }}
+              {% if field.help_text %}
+                <span class="help-block">{{ field.help_text|safe }}</span>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+        </fieldset>
+      {% endfor %}
+      <fieldset>
+        {% for field in dataDictExtrasForm %}
+          <div class="form-group {%if field.errors %}has-errors{%endif%}">
+            {% if field.errors %}
+              <div class="control-group alert alert-dismissible alert-danger">
+                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                  <ul class="errorlist">
+                    {% for error in field.errors %}
+                      <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                  </ul>
+              </div>
+            {% endif %}
+            <label class="col-sm-2 control-label" for="{{ field.name }}">
+              {{ field.label }}
+            </label>
+            <div class="col-sm-10">
+              {{ field }}
+              {% if field.help_text %}
+                <span class="help-block">{{ field.help_text|safe }}</span>
+              {% endif %}
+            </div>
+        {% endfor %}
+      </fieldset>
+    <div class="form-group">
+      <div class="col-sm-6 col-sm-offset-2">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </div>
+    </form>
+
+{# Dynamic formset for files without header information #}
+
+  {% else %}
+
+    {% load formset_tags %}
+
+    <div id="formset" data-formset-prefix="{{ fieldsFormset.prefix }}">
+
+      <div data-formset-body>
+        {# New forms inserted here #}
+        {% for fieldForm in fieldsFormset %}
+          <div data-formset-form>
+            {% for field in fieldForm %}
+              <div class="form-group {%if field.errors %}has-errors{%endif%}">
+                {% if field.errors %}
+                  <div class="control-group alert alert-dismissible alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <ul class="errorlist">
+                      {% for error in field.errors %}
+                        <li><strong>{{ error|escape }}</strong></li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+                <label class="col-sm-2 control-label" for="{{ field.name }}">
+                  {{ field.label }}
+                </label>
+                <div class="col-sm-10">
+                  {{ field }}
+                  {% if field.help_text %}
+                    <span class="help-block">{{ field.help_text|safe }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+            <div class="form-group">
+              <div class="col-sm-6 col-sm-offset-2">
+                <button type="button" class="btn btn-danger" data-formset-delete-button>Delete field</button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Empty form template. By wrapping in a script tag, the __prefix__
+      placeholder can easily be replaced in both attributes and any scripts. -->
+
+      <script type="form-template" data-formset-empty-form>
+        {% escapescript %}
+          <div data-formset-form>
+            {% for field in fieldsFormset.empty_form %}
+              <label class="col-sm-2 control-label" for="{{ field.name }}">
+                {{ field.label }}
+              </label>
+              <div class="col-sm-10">
+                {{ field }}
+                {% if field.help_text %}
+                  <span class="help-block">{{ field.help_text|safe }}</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+            <div class="form-group">
+              <div class="col-sm-6 col-sm-offset-2">
+                <br>
+                <button type="button" class="btn btn-danger" data-formset-delete-button>Delete field</button>
+              </div>
+            </div>
+          </div>
+        {% endescapescript %}
+      </script>
+
+      <fieldset>
+        {% for field in dataDictExtrasForm %}
+          <div class="form-group {%if field.errors %}has-errors{%endif%}">
+            {% if field.errors %}
+              <div class="control-group alert alert-dismissible alert-danger">
+                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                  <ul class="errorlist">
+                    {% for error in field.errors %}
+                      <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                  </ul>
+              </div>
+            {% endif %}
+            <label class="col-sm-2 control-label" for="{{ field.name }}">
+              {{ field.label }}
+            </label>
+            <div class="col-sm-10">
+              {{ field }}
+              {% if field.help_text %}
+                <span class="help-block">{{ field.help_text|safe }}</span>
+              {% endif %}
+            </div>
+        {% endfor %}
+      </fieldset>
+
+      {# This button will add a new form when clicked. #}
+      <div class="form-group">
+        <div class="col-sm-6">
+          <div class="col-sm-2 col-sm-offset-2">
+            <input type="button" class="btn btn-default" value="Add another" data-formset-add>
+          </div>
+
+          <div class="col-sm-6 col-sm-offset-2">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        jQuery(function($) {
+          $('#formset').formset({
+            animateForms: true
+          });
+
+        });
+
+        $('#formset').on('formAdded', function(event) {
+          // $("label[for='DELETE']").css("display", "none");
+          // $("input[id*='DELETE']").css("display", "none");
+          $("label[for='DELETE']").css("margin-left", "-500000px")
+            .css("position", "absolute");
+          $("input[id*='DELETE']").css("margin-left", "-500000px")
+            .css("position", "absolute");
+        });
+
+
+      </script>
+
+    </div>
+
+
+
+  {% endif %}
+
+{% endblock %}

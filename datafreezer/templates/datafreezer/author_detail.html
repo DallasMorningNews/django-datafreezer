@@ -1,0 +1,39 @@
+{% extends 'datafreezer/base_detail.html' %}
+
+<!--Header container-->
+{% block title %}{{ page_title }}{% endblock title %}
+
+
+{% block description_text %}
+  <p class="lead">These are the datasets that {{ page_title }} has uploaded.</p>
+{% endblock description_text %}
+
+<!--Basic meta information-->
+{% block meta_panel %}
+  <dt>Email</dt>
+  <dd><a href="mailto:{{ datasets.0.uploaded_by }}">{{ datasets.0.uploaded_by }}</a></dd>
+  <dt>Datasets Uploaded</dt>
+  <dd>{{ num_datasets }}</dd>
+  <dt>Most Used Hub</dt>
+  <dd><a href="#">{{ hub }}</a></dd>
+  <dt>Most Used Tags</dt>
+  {% for tag in tags %}
+    <dd><a href="{% url 'datafreezer_tag_detail' tag.slug }">{{ tag.word }}</a></dd>
+  {% endfor %}
+{% endblock meta_panel %}
+
+<!--End basic meta information-->
+
+
+{% block dataset_info %}
+<div class="col-md-4">
+  <h5>{{ dataset.title }}</h5>
+</div>
+<div class="col-md-offset-4 col-md-4">
+  <h5><small>Uploaded on:</small> {{ dataset.date_uploaded|date:"SHORT_DATE_FORMAT" }}</h5>
+</div>
+{% endblock dataset_info %}
+
+{% block empty_page_text %}
+Sorry, {{ page_title }} hasn't yet uploaded any datasets.
+{% endblock empty_page_text %}

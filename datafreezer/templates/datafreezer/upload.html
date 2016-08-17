@@ -1,0 +1,102 @@
+{% extends 'datafreezer/base.html' %}
+  {% block title %}
+    {{ formTitle }}
+  {% endblock title %}
+  {% block content %}
+  <form class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
+    {% csrf_token %}
+    <fieldset>
+      {{ fileUploadForm.non_field_errors }}
+      {% for field in fileUploadForm %}
+      <div class="form-group {%if field.errors %}has-error{%endif%}">
+        {% if field.errors %}
+          <div class="control-group alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <ul class="errorlist">
+              {% for error in field.errors %}
+                <li><strong>{{ error|escape }}</strong></li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+        <label class="col-sm-2 control-label" for="{{ field.name }}">
+          {{ field.label }}
+        </label>
+        <div class="col-sm-10">
+          {{ field }}
+        {% if field.help_text %}
+        <span class="help-block">{{ field.help_text|safe }}</span>
+        {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+      <div class="form-group">
+        <div class="col-sm-6 col-sm-offset-2">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+{% endblock %}
+{% block scripts %}
+<script>
+
+    // var tag = $('.id_tags').val();
+
+    function split(val){
+      return val.split(/,\s*/);
+    }
+
+    function extractLast(term){
+      return split(term).pop();
+    }
+
+
+    var tagField = $( "#id_tags" )
+          // don't navigate away from the field on tab when selecting an item
+          .on( "input change", $.debounce(500, false, function( event ) {
+            if ( event.keyCode === $.ui.keyCode.TAB &&
+                $( this ).autocomplete( "instance" ).menu.active ) {
+              event.preventDefault();
+            }
+
+          }))
+            .autocomplete({
+            source: function( request, response ) {
+              $.getJSON( "/datafreezer/taglookup/", {
+                tag: extractLast(request.term)
+              }, response );
+            },
+            search: function() {
+              // custom minLength
+              var term = extractLast( this.value );
+              if ( term.length < 2 ) {
+                return false;
+              }
+            },
+            focus: function() {
+              // prevent value inserted on focus
+              return false;
+            },
+            select: function( event, ui ) {
+              var terms = split( this.value );
+              // remove the current input
+              terms.pop();
+              // add the selected item
+              terms.push( ui.item.value );
+              // add placeholder to get the comma-and-space at the end
+              terms.push( "" );
+              this.value = terms.join( ", " );
+              return false;
+            }
+
+          });
+
+          $(document).on({
+            ajaxStart: function() { tagField.addClass('loading');  },
+            ajaxStop: function() { tagField.removeClass('loading'); }
+          })
+
+</script>
+{% endblock %}

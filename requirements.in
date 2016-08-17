@@ -1,0 +1,12 @@
+Django~=1.10
+boto~=2.39
+dj-database-url
+django-storages
+gunicorn
+oauthlib
+psycopg2
+requests
+wsgiref
+django-formset-js
+beautifulsoup4~=4.5.1
+django-debug-toolbar~=1.5

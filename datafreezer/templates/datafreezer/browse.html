@@ -1,0 +1,36 @@
+{% extends 'datafreezer/base.html' %}
+
+<!--Header container-->
+
+{% block title %}Browse {{ filter }}{% endblock title %}
+
+{% block content %}
+
+  <!-- Begin descriptor row -->
+  <div class="container-fluid">
+    {% for item in items %}
+      {% if filter == 'Authors' %}
+        <a href="{% url 'datafreezer_author_detail' item.id %}">
+      {% elif filter == 'Tags' %}
+        <a href="{% url 'datafreezer_tag_detail' item.id %}">
+      {% endif %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="row-fluid">
+              <div class="col-md-8 col-sm-6">
+                <h4>{{ item.name }}</h4>
+              </div>
+              <div class="col-md-offset-2 col-md-2 col-sm-offset-2 col-sm-4">
+                <h4><small>Uploads:</small> {{ item.count }}</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+  <!-- End descriptor row -->
+
+
+<!--End article listing-->
+{% endblock content %}

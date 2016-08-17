@@ -1,0 +1,1 @@
+This directory is used to compile client-side assets, for instance using a `gulp`-based app like [generator-dmndjango](https://github.com/DallasMorningNews/generator-dmndjango).
