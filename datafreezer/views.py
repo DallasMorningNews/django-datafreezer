@@ -22,12 +22,17 @@ from bs4 import BeautifulSoup
 from csv import reader
 import json
 
-# We can actually scrape any site for a title that has a meta og:title tag.
-DMN_LEGACY_DOMAIN = "http://www.dallasnews.com/"
-DMN_BETA_DOMAIN = "http://beta.dallasnews.com/"
-SCRAPABLE_DOMAINS = [DMN_LEGACY_DOMAIN, DMN_BETA_DOMAIN]
-HUBS_LIST = requests.get('http://datalab.dallasnews.com/staff/api/hub/').json()
-STAFF_LIST_URL = 'http://datalab.dallasnews.com/staff/api/staff/'
+
+def load_json_endpoint(data_url):
+    return requests.get(data_url).json()
+
+# We can scrape any site that is optimized for social media (graph tags/og)
+HUBS_LIST = load_json_endpoint(
+    getattr(settings, 'HUBS_LIST_URL', '/api/hub/')
+)
+STAFF_LIST = load_json_endpoint(
+    getattr(settings, 'STAFF_LIST_URL', '/api/staff/')
+)
 
 
 def add_dataset(fileUploadForm, request):
@@ -52,29 +57,44 @@ def add_dataset(fileUploadForm, request):
 	print tag_list
 
 	for url in url_list:
+		url = url.strip()
 		if len(url) > 0:
 			article, created = Article.objects.get_or_create(url=url)
-			# @TODO: More reliable domain detection
 			if created:
-				# Parse article title if it's from DMN
-				parsed_uri = urlparse(url)
-				parsed_domain = '{uri.scheme}://{uri.netloc}/'.format(uri=parsed_uri)
-				# If URL domain is in SCRAPABLE_DOMAINS this means we know
-				# how to scrape title reliably from these pages
-				if parsed_domain in SCRAPABLE_DOMAINS:
-					# Pull down article. Check request status.
-					article_req = requests.get(url)
-					if article_req.status_code == 200:
-						# We good. Get the HTML.
-						page = article_req.content
-						soup = BeautifulSoup(page, 'html.parser')
-						#Looking for <meta ... property="og:title">
-						titleMetatags = soup.find_all('meta', {"property": "og:title"})
-						# Should be only one, so first index:
-						headline = titleMetatags[0]['content']
-						article.title = headline
-				article.save()
-				dataset_upload.appears_in.add(article)
+				article_req = requests.get(url)
+				if article_req.status_code == 200:
+					# We good. Get the HTML.
+					page = article_req.content
+					soup = BeautifulSoup(page, 'html.parser')
+					#Looking for <meta ... property="og:title">
+					meta_title_tag = soup.find('meta', attrs={'property': 'og:title'})
+					try:
+						# print "Trying og:title..."
+						# print meta_title_tag
+						title = meta_title_tag['content']
+					# TypeError implies meta_title_tag is None
+					# KeyError implies that meta_title_tag does not have a content property.
+					except (TypeError, KeyError):
+						title_tag = soup.find('title')
+						try:
+							# print "Falling back to title..."
+							# print title_tag
+							title = title_tag.text
+						except (TypeError, KeyError):
+							description_tag = soup.find('meta', attrs={'property': 'og:description'})
+							try:
+								# print "Falling back to description..."
+								# print description_tag
+								title = description_tag['content']
+							# Fall back value. Display is handled in models.
+							except (TypeError, KeyError):
+								title = None
+
+					print title
+					article.title = title
+					article.save()
+
+			dataset_upload.appears_in.add(article)
 
 		for tag in tag_list:
 			# print tag
@@ -97,9 +117,7 @@ def parse_csv_headers(dataset_id):
 
 # Handles multiple emails, returns a dictionary of {email: name}
 def grab_names_from_emails(email_list):
-	all_staff = requests.get(STAFF_LIST_URL)
-
-	all_staff = all_staff.json()
+	all_staff = STAFF_LIST
 
 	emails_names = {}
 
@@ -367,7 +385,7 @@ class AuthorDetail(DetailBase):
 			Count('word')
 		).order_by('-word__count')[:5]
 
-		hubs = matching_datasets.values("hub_slug").annotate(Count('hub_slug'))
+		hubs = matching_datasets.values("hub_slug").annotate(Count('hub_slug')).order_by('-hub_slug__count')
 		most_used_hub = get_hub_name_from_slug(hubs[0]['hub_slug'])
 
 		return {

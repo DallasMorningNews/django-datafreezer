@@ -142,3 +142,8 @@ INTERNAL_IPS = [
     '127.0.0.1',
     '::1'
     ]
+
+# Datafreezer Settings
+
+HUBS_LIST_URL = 'http://datalab.dallasnews.com/staff/api/hub/'
+STAFF_LIST_URL = 'http://datalab.dallasnews.com/staff/api/staff/'

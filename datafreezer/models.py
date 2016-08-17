@@ -30,9 +30,9 @@ class Tag(models.Model):
 
 
 class Article(models.Model):
-	url = models.URLField()
+	url = models.URLField(max_length=500)
 	# Serif API:
-	title = models.CharField(max_length=500, blank=True, null=True)
+	_title = models.CharField(max_length=500, blank=True, null=True, db_column="title")
 	image_url = models.URLField(blank=True, null=True)
 
 	def __unicode__(self):
@@ -40,6 +40,13 @@ class Article(models.Model):
 			return self.title
 		else:
 			return self.url
+
+	@property
+	def title(self):
+		if self._title is None:
+			return "Dataset sourced in %s" %(self.url)
+		else:
+			return self._title
 
 
 class DataDictionary(models.Model):
