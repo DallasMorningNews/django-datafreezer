@@ -78,32 +78,39 @@
 
   {% block title %}{{ heading }}{% endblock title %}
   {%block content%}
-  <div class="table-responsive">
-    <table class='table table-hover'>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Date Uploaded</th>
-          <th>Uploader</th>
-          <th>Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for upload in recent_uploads %}
-          <tr>
-            <td>{{ upload.title }}</td>
-            <td>{{ upload.date_uploaded }}</td>
-            <td>{{ upload.fullName }}</td>
-            <td>
-              <a href="{% url 'datafreezer_dataset_detail' upload.id %}" class="btn btn-primary btn-block" role="button">
-                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-              </a>
-          </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+    {% if recent_uploads %}
+      <div class="table-responsive">
+        <table class='table table-hover'>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Date Uploaded</th>
+              <th>Uploader</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for upload in recent_uploads %}
+              <tr>
+                <td>{{ upload.title }}</td>
+                <td>{{ upload.date_uploaded }}</td>
+                <td>{{ upload.fullName }}</td>
+                <td>
+                  <a href="{% url 'datafreezer_dataset_detail' upload.id %}" class="btn btn-primary btn-block" role="button">
+                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                  </a>
+              </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      {% block no_results_msg %}
+        {{ block.super }}
+      {% endblock no_results_msg %}
+    </div>
+    {% endif %}
   {%endblock content%}
 {%block custom_foot%}
 <script type="text/javascript"></script>

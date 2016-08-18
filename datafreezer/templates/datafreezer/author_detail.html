@@ -18,7 +18,7 @@
   <dd><a href="#">{{ hub }}</a></dd>
   <dt>Most Used Tags</dt>
   {% for tag in tags %}
-    <dd><a href="{% url 'datafreezer_tag_detail' tag.slug }">{{ tag.word }}</a></dd>
+    <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>
   {% endfor %}
 {% endblock meta_panel %}
 
@@ -26,10 +26,10 @@
 
 
 {% block dataset_info %}
-<div class="col-md-4">
+<div class="col-md-6">
   <h5>{{ dataset.title }}</h5>
 </div>
-<div class="col-md-offset-4 col-md-4">
+<div class="col-md-offset-2 col-md-4">
   <h5><small>Uploaded on:</small> {{ dataset.date_uploaded|date:"SHORT_DATE_FORMAT" }}</h5>
 </div>
 {% endblock dataset_info %}

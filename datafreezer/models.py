@@ -43,10 +43,14 @@ class Article(models.Model):
 
 	@property
 	def title(self):
-		if self._title is None:
+		if not self._title:
 			return "Dataset sourced in %s" %(self.url)
 		else:
 			return self._title
+
+	@title.setter
+	def title(self, value):
+		self._title = value
 
 
 class DataDictionary(models.Model):

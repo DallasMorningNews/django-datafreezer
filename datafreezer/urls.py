@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.conf import settings
-from views import *
+from datafreezer.views import *
 
 urlpatterns = [
 	url(r'^$', home, name='datafreezer_home'),

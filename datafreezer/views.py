@@ -13,8 +13,8 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from django.db.models import Count
 
-from models import *
-from forms import *
+from datafreezer.models import Dataset, Article, Tag, DataDictionary, DataDictionaryField
+from datafreezer.forms import DataDictionaryUploadForm, DataDictionaryFieldUploadForm, DatasetUploadForm
 
 import requests
 from urlparse import urlparse
@@ -111,7 +111,7 @@ def parse_csv_headers(dataset_id):
 	with open(data.dataset_file.path, 'r') as datasetFile:
 		reader = csv.reader(datasetFile, delimiter=',', quotechar='"')
 		headers = next(reader)
-		print headers
+		# print headers
 	return headers
 
 
@@ -151,10 +151,18 @@ def get_vertical_name_from_slug(vertical_slug):
 
 	return vertical_slug
 
+
+@require_http_methods(["GET"])
+def tag_lookup(request):
+	tag = request.GET['tag']
+	tagSlug = slugify(tag.strip().lower())
+	tagCandidates = Tag.objects.filter(slug__startswith=tagSlug)
+	tags = json.dumps([candidate.word for candidate in tagCandidates])
+	return HttpResponse(tags, content_type='application/json')
+
+
 # @login_required
 # Home page for the application
-# Two buttons: Uploading or Browsing?
-# Feed of most recently uploaded datasets underneath
 def home(request):
 	recent_uploads = Dataset.objects.order_by('-date_uploaded')[:10]
 
@@ -178,11 +186,6 @@ def home(request):
 		'heading': 'Most Recent Uploads'})
 
 
-def dataset_upload_placeholder(request):
-	test_set = Dataset.objects.get(pk=4)
-	return redirect('datafreezer_datadict_upload', dataset_id=test_set.id)
-
-
 # Upload a data set here
 def dataset_upload(request):
 	if request.method == 'POST':
@@ -204,7 +207,7 @@ def dataset_upload(request):
 		{'fileUploadForm': fileUploadForm,
 		'formTitle': 'Upload a Dataset'})
 
-
+# Data dictionary form
 def data_dictionary_upload(request, dataset_id):
 	active_dataset = get_object_or_404(Dataset, pk=dataset_id)
 	if active_dataset.has_headers:
@@ -263,16 +266,7 @@ def data_dictionary_upload(request, dataset_id):
 		'title': page_title,
 		'hasHeaders': active_dataset.has_headers})
 
-
-@require_http_methods(["GET"])
-def tag_lookup(request):
-	tag = request.GET['tag']
-	tagSlug = slugify(tag.strip().lower())
-	tagCandidates = Tag.objects.filter(slug__startswith=tagSlug)
-	tags = json.dumps([candidate.word for candidate in tagCandidates])
-	return HttpResponse(tags, content_type='application/json')
-
-
+# View individual dataset
 def dataset_detail(request, dataset_id):
 	active_dataset = get_object_or_404(Dataset, pk=dataset_id)
 	datadict_id = active_dataset.data_dictionary_id
@@ -298,41 +292,89 @@ def dataset_detail(request, dataset_id):
 		'articles': articles})
 
 
-class BrowseAuthors(View):
+class BrowseBase(View):
+	page_title = "Browse "
+
+	def generate_page_title(self):
+		raise NotImplementedError
+
+	def generate_sections(self):
+		raise NotImplementedError
+
 	def get(self, request):
-		authors = Dataset.objects.values('uploaded_by').annotate(Count('uploaded_by'))
-		emails = [row['uploaded_by'] for row in authors]
-		email_name_map = grab_names_from_emails(emails)
+		sections = self.generate_sections()
+
+		context = {
+			'sections': sections,
+			'page_title': self.generate_page_title(),
+			'browse_type': self.browse_type
+		}
+
+		return render(
+			request,
+			self.template_path,
+			context
+		)
+
+
+class BrowseAuthors(BrowseBase):
+	template_path = 'datafreezer/browse.html'
+	browse_type = 'AUTHORS'
+
+	def generate_page_title(self):
+		return self.page_title + 'Authors'
+
+	def generate_sections(self):
+		authors = Dataset.objects.values(
+			'uploaded_by'
+		).annotate(
+			upload_count=Count(
+				'uploaded_by'
+			)
+		).order_by('-upload_count')
+
+		email_name_map = grab_names_from_emails(
+			[row['uploaded_by'] for row in authors]
+		)
+
 		for author in authors:
 			for emailKey in email_name_map:
 				if author['uploaded_by'] == emailKey:
 					author['name'] = email_name_map[emailKey]
 
-		context = []
-		for author in authors:
-			context.insert(0, {'id': author['uploaded_by'],
+		return [
+			{
+				'slug': author['uploaded_by'],
 				'name': author['name'],
-				'count': author['uploaded_by__count']})
+				'count': author['upload_count']
 
-		return render(request, 'datafreezer/browse.html',
-			{'filter': 'Authors',
-			'items': context})
+			}
+			for author in authors
+		]
 
 
-class BrowseTags(View):
-	def get(self, request):
-		tags = Tag.objects.all().annotate(dataset_count=Count('dataset')).order_by('dataset_count')
+class BrowseTags(BrowseBase):
+	template_path = 'datafreezer/browse.html'
+	browse_type = 'TAGS'
 
-		context = []
-		for tag in tags:
-			context.insert(0, {'id': tag.slug,
+	def generate_page_title(self):
+		return self.page_title + 'Tags'
+
+	def generate_sections(self):
+		tags = Tag.objects.all().annotate(
+			dataset_count=Count('dataset')
+		).order_by('-dataset_count')
+
+		sections = [
+			{
+				'id': tag.slug,
 				'name': tag.word,
-				'count': tag.dataset_count})
-			# print (tag.word, tag.word__count)
+				'count': tag.dataset_count
+			}
+			for tag in tags
+		]
 
-		return render(request, 'datafreezer/browse.html',
-			{'filter': 'Tags',
-			'items': context})
+		return sections
 
 
 class DetailBase(View):
@@ -375,7 +417,9 @@ class AuthorDetail(DetailBase):
 		return grab_names_from_emails([data_slug])[data_slug]
 
 	def generate_matching_datasets(self, data_slug):
-		return Dataset.objects.filter(uploaded_by=data_slug)
+		return Dataset.objects.filter(
+			uploaded_by=data_slug
+		).order_by('-date_uploaded')
 
 	def generate_additional_context(self, matching_datasets):
 		dataset_ids = [upload.id for upload in matching_datasets]
@@ -386,12 +430,17 @@ class AuthorDetail(DetailBase):
 		).order_by('-word__count')[:5]
 
 		hubs = matching_datasets.values("hub_slug").annotate(Count('hub_slug')).order_by('-hub_slug__count')
-		most_used_hub = get_hub_name_from_slug(hubs[0]['hub_slug'])
+		if hubs:
+			most_used_hub = get_hub_name_from_slug(hubs[0]['hub_slug'])
+			hub_slug = hubs[0]['hub_slug']
+		else:
+			most_used_hub = None
+			hub_slug = None
 
 		return {
 			'tags': tags,
 			'hub': most_used_hub,
-			'hub_slug': hubs[0]['hub_slug'],
+			'hub_slug': hub_slug,
 		}
 
 
@@ -404,61 +453,15 @@ class TagDetail(DetailBase):
 
 	def generate_matching_datasets(self, data_slug):
 		tag = Tag.objects.filter(slug=data_slug)
-		return tag[0].dataset_set.all()
+		return tag[0].dataset_set.all().order_by('-uploaded_by')
 
 	def generate_additional_context(self, matching_datasets):
 		related_tags = Tag.objects.filter(
 			dataset__in=matching_datasets
 		).distinct().annotate(
 			Count('word')
-		).order_by('-word__count')
+		).order_by('-word__count')[:5]
 
 		return {
 			'related_tags': related_tags
 		}
-
-
-
-# class AuthorDetail(View):
-# 	def get(self, request, email):
-# 		author_datasets = Dataset.objects.filter(uploaded_by=email)
-# 		num_datasets = author_datasets.count()
-# 		author_name = grab_names_from_emails([email])[email]
-#
-# 		dataset_ids = [upload.id for upload in author_datasets]
-# 		tags = Tag.objects.filter(dataset__in=dataset_ids).distinct().annotate(Count('word')).order_by('-word__count')[:5]
-#
-# 		hubs = Dataset.objects.filter(uploaded_by=email).values("hub_slug").annotate(Count('hub_slug'))
-#
-# 		try:
-# 			most_used_hub = get_hub_name_from_slug(hubs[0]['hub_slug'])
-# 			hub_slug = hubs[0]['hub_slug']
-# 		except IndexError:
-# 			most_used_hub = None
-# 			hub_slug = None
-#
-# 		return render(request, 'datafreezer/author_detail.html',
-# 			{'datasets': author_datasets,
-# 			'num_datasets': num_datasets,
-# 			'name': author_name,
-# 			'tags': tags,
-# 			'hub': most_used_hub,
-# 			'hub_slug': hub_slug
-# 			})
-#
-#
-# class TagDetail(View):
-# 	def get(self, request, tag_slug):
-# 		# Only one tag will have this slug so we can just use [0]
-# 		tag = Tag.objects.filter(slug=tag_slug)[0]
-#
-# 		tag_word = tag.word
-# 		tag_datasets = tag.dataset_set.all()
-# 		num_datasets = tag_datasets.count()
-# 		related_tags = Tag.objects.filter(dataset__in=tag_datasets).distinct().annotate(Count('word')).order_by('-word__count')[:5]
-#
-# 		return render(request, 'datafreezer/tag_detail.html',
-# 			{'tag': tag_word,
-# 			'datasets': tag_datasets,
-# 			'related_tags': related_tags,
-# 			'num_datasets': num_datasets})

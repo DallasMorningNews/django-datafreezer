@@ -57,6 +57,14 @@
           </h2>
         </div>
         {% block content %}
+          {% block no_results_msg %}
+            <div class="jumbotron">
+              <div class="container">
+                <h3 class="display-3">There's nothing here yet!</h3>
+                <p class="lead">Datasets uploaded via the <a href="{% url 'datafreezer_upload' %}">Upload</a> tab in the navigation bar
+                  will be displayed on the homepage and under the <a href="#">Browse</a> tabs.</p>
+              </div>
+            {% endblock no_results_msg %}
         {% endblock content %}
       </div>
     </div>

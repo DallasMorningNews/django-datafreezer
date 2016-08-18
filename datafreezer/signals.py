@@ -8,6 +8,7 @@ from models import *
 
 
 def foo(sender, **kwargs):
-    print "Received!"
+    # print "Received!"
+    pass
 
 post_save.connect(foo, sender=Dataset, weak=True, dispatch_uid=None)
