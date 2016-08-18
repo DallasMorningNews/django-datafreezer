@@ -1,0 +1,46 @@
+{% extends 'datafreezer/base.html' %}
+
+<!--Header container-->
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+
+  <!-- Begin descriptor row -->
+  {% if sections %}
+    <div class="table-responsive">
+      <table class='table table-hover'>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date Uploaded</th>
+            <th>Uploader</th>
+            <th>Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for section in sections %}
+            <tr>
+              <td>{{ section.title }}</td>
+              <td>{{ section.date_uploaded }}</td>
+              <td>{{ section.fullName }}</td>
+              <td>
+                <a href="{% url 'datafreezer_dataset_detail' section.id %}" class="btn btn-primary btn-block" role="button">
+                  <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+                </a>
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    {% block no_results_msg %}
+      {{ block.super }}
+    {% endblock no_results_msg %}
+  {% endif %}
+  <!-- End descriptor row -->
+
+
+<!--End article listing-->
+{% endblock content %}

@@ -145,11 +145,14 @@ def prepare_data_dict(dataset_id):
 
     fields = []
 
+    col = 0
     for header in headers:
+        col += 1
         field = DataDictionaryField(
             heading=header,
             description=create_dataset_description(25),
-            dataType="TEXT"
+            dataType="TEXT",
+            columnIndex=col
         )
         field.parent_dict = data_dict
         field.save()
@@ -166,7 +169,7 @@ def create_datasets(num_datasets):
         )
 
 
-        created_dataset.dataset_file = './datafreezer/uploads/crimes_by_tract.csv'
+        created_dataset.dataset_file = '2016/08/18/neighborhood_crime_zscores.csv'
         created_dataset.has_headers = True
 
         # uploaders = ['tydavis@dallasnews.com', 'ajvestal@dallasnews.com', 'jmcclure@dallasnews.com']

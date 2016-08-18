@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
 from django.conf import settings
+from django.views.static import serve
 from datafreezer.views import *
 
 urlpatterns = [
@@ -19,6 +20,10 @@ urlpatterns = [
 		AuthorDetail.as_view(), name='datafreezer_author_detail'),
 	url(r'^browse/tags/(?P<slug>[-\w]+)/$',
 		TagDetail.as_view(), name='datafreezer_tag_detail'),
+	url(r'^browse/all/$', BrowseAll.as_view(), name='datafreezer_browse_all'),
+	url(r'^download/datadict/(?P<dataset_id>\d{1,})/$',
+		download_data_dictionary,
+		name='datafreezer_download_data_dictionary'),
 
 
 	# url(r'^detail/(\d+)/$')

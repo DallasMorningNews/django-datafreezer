@@ -76,7 +76,7 @@
 </script>
 {%endblock%}
 
-  {% block title %}{{ heading }}{% endblock title %}
+  {% block title %}{{ heading }} <a href="{% url 'datafreezer_browse_all' %}"><small>Click to see all datasets</small></a>{% endblock title %}
   {%block content%}
     {% if recent_uploads %}
       <div class="table-responsive">

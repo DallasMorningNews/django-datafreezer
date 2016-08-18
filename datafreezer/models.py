@@ -4,6 +4,7 @@ from django.utils import timezone
 import os
 
 from apps import BASE_DIR
+from core.settings import MEDIA_ROOT
 
 import string
 import itertools
@@ -132,7 +133,7 @@ class Dataset(models.Model):
 	tags = models.ManyToManyField(Tag)
 	appears_in = models.ManyToManyField(Article, blank=True)
 	data_dictionary = models.OneToOneField(DataDictionary, null=True)
-	dataset_file = models.FileField(upload_to='datafreezer/uploads/%Y/%m/%d/')
+	dataset_file = models.FileField(max_length=500, upload_to='%Y/%m/%d/')
 
 	# zip it up
 	attachments = models.FileField(blank=True, null=True)
