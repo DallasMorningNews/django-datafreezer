@@ -13,7 +13,11 @@
         {% if browse_type == 'AUTHORS' %}
           <a href="{% url 'datafreezer_author_detail' section.slug %}">
         {% elif browse_type == 'TAGS' %}
-          <a href="{% url 'datafreezer_tag_detail' section.id %}">
+          <a href="{% url 'datafreezer_tag_detail' section.slug %}">
+				{% elif browse_type == 'HUBS' %}
+					<a href="{% url 'datafreezer_hub_detail' section.slug %}">
+				{% elif browse_type == 'VERTICALS' %}
+					<a href="{% url 'datafreezer_vertical_detail' section.slug %}">
         {% endif %}
           <div class="panel panel-default">
             <div class="panel-body">

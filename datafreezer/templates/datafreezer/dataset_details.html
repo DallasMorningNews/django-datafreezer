@@ -6,62 +6,60 @@
 {% block content %}
 
   <!-- Begin descriptor row -->
-  <div class="jumbotron">
-    <div class="container">
-      <!-- Row begins -->
-      <div class="row-fluid">
-        <div class="col-sm-6">
-          <p class="lead">{{ dataset.description }}</p>
-        </div>
-        <!--Basic meta information-->
-        <div class="col-sm-6">
-          <dl class="dl-horizontal">
-            <div class="panel panel-default">
-              <div class="panel-body">
-                {% if dataset.date_begin != None and dataset.date_end != None %}
-                  <dt>Date range</dt>
-                  <dd>{{ dataset.date_begin|date:"N d, Y" }} - {{ dataset.date_end|date:"N d, Y" }}</dd>
-                {% endif %}
-                <dt>Date uploaded</dt>
-                <dd>{{ dataset.date_uploaded }}</dd>
-                <dt>Uploaded by</dt>
-                <dd><a href="{% url 'datafreezer_author_detail' dataset.uploaded_by %}">{{ uploader_name }}</a></dd>
-                <dt>Vertical</dt>
-                <dd><a href="#">{{ dataset.vertical }}</a></dd>
-                <dt>Hub</dt>
-                <dd><a href="#">{{ dataset.hub }}</a></dd>
-                <dt>Tags</dt>
-                {% for tag in tags %}
-                  <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>
-                {% endfor %}
-              </div>
-            </div>
-          </dl>
-        </div>
-        <!--End basic meta information-->
-      </div>
-      <div></div>
-      <!-- End row -->
-      <div class="row-fluid">
-        <div class="col-md-6">
-          <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button">
-          Download Dataset
-          </a>
-        </div>
-        <br>
-        <div class="col-md-6">
-          <a href="{% url 'datafreezer_download_data_dictionary' dataset.id %}" class="btn btn-block" role="button">
-            Download Data Dictionary
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
+		<div class="jumbotron">
+		  <div class="container">
+		    <!-- Row begins -->
+		    <div class="row">
+		      <div class="col-md-5">
+		        <p class="lead">{{ dataset.description }}</p>
+		      </div>
+		      <!--Basic meta information-->
+		      <div class="col-md-7">
+		        <dl class="dl-horizontal">
+		          <div class="panel panel-default">
+		            <div class="panel-body">
+		              {% if dataset.date_begin != None and dataset.date_end != None %}
+		                <dt>Date range</dt>
+		                <dd>{{ dataset.date_begin|date:"N d, Y" }} - {{ dataset.date_end|date:"N d, Y" }}</dd>
+		              {% endif %}
+		              <dt>Date uploaded</dt>
+		              <dd>{{ dataset.date_uploaded }}</dd>
+		              <dt>Uploaded by</dt>
+		              <dd><a href="{% url 'datafreezer_author_detail' dataset.uploaded_by %}">{{ uploader_name }}</a></dd>
+		              <dt>Vertical</dt>
+		              <dd><a href="{% url 'datafreezer_vertical_detail' dataset.vertical|slugify %}">{{ dataset.vertical }}</a></dd>
+		              <dt>Hub</dt>
+		              <dd><a href="{% url 'datafreezer_hub_detail' dataset.hub_slug %}">{{ dataset.hub }}</a></dd>
+		              <dt>Tags</dt>
+		              {% for tag in tags %}
+		                <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>
+		              {% endfor %}
+		            </div>
+		          </div>
+		        </dl>
+		      </div>
+		      <!--End basic meta information-->
+		    </div>
+		    <!-- End row -->
+	      <div class="row">
+	        <div class="col-md-6">
+	          <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button">
+	          Download Dataset
+	          </a>
+	        </div>
+	        <div class="col-md-6">
+	          <a href="{% url 'datafreezer_download_data_dictionary' dataset.id %}" class="btn btn-block" role="button">
+	            Download Data Dictionary
+	          </a>
+	        </div>
+	      </div>
+			</div>
+  	</div>
   <!-- End descriptor row -->
 
 <!--Data dictionary information-->
 <div class="container-fluid">
-  <div class="col-sm-12">
+  <div class="col-md-12">
     <h4>Data Dictionary <small>What's in this dataset?</small></h4>
   </div>
   <table class="table table-hover">

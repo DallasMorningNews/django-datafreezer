@@ -20,6 +20,7 @@ import requests
 from urlparse import urlparse
 from bs4 import BeautifulSoup
 from csv import reader, writer
+from copy import deepcopy
 import json
 
 
@@ -34,6 +35,22 @@ STAFF_LIST = load_json_endpoint(
 	getattr(settings, 'STAFF_LIST_URL', '/api/staff/')
 )
 
+
+def map_hubs_to_verticals():
+	vertical_hub_map = {}
+	for hub in HUBS_LIST:
+		vertical_slug = hub['vertical']['slug']
+		if vertical_slug not in vertical_hub_map:
+			vertical_hub_map[vertical_slug] = {
+				'name': hub['vertical']['name'],
+				'hubs': [hub['slug']]
+			}
+		else:
+			vertical_hub_map[vertical_slug]['hubs'].append(hub['slug'])
+
+	return vertical_hub_map
+
+VERTICAL_HUB_MAP = map_hubs_to_verticals()
 
 def add_dataset(fileUploadForm, request):
 	# Save form to create dataset model
@@ -324,15 +341,30 @@ def dataset_detail(request, dataset_id):
 
 
 class BrowseBase(View):
+	'''Abstracted class for class-based Browse views.'''
 	page_title = "Browse "
 
 	def generate_page_title(self):
+		'''
+		Not implemented in base class.
+		Child classes return an appropriate page title to template.
+		'''
 		raise NotImplementedError
 
 	def generate_sections(self):
+		'''
+		Not implemented in base class.
+		Child classes return categories/sections dependent on the type of view.
+		For mid-level browse views, these are categorical.
+		For all, these sections are simply datasets.
+		'''
 		raise NotImplementedError
 
 	def get(self, request):
+		'''
+		Returns template and context from generate_page_title and
+		generate_sections to populate template.
+		'''
 		sections = self.generate_sections()
 
 		context = {
@@ -349,11 +381,12 @@ class BrowseBase(View):
 
 
 class BrowseAll(BrowseBase):
+	'''Return all Datasets to template ordered by date uploaded.'''
 	template_path = 'datafreezer/browse_all.html'
 	browse_type = 'ALL'
 
 	def generate_page_title(self):
-		return self.page_title + 'All'
+		return self.page_title + self.browse_type.title()
 
 	def generate_sections(self):
 		datasets = Dataset.objects.all().order_by('-date_uploaded')
@@ -362,12 +395,41 @@ class BrowseAll(BrowseBase):
 		return datasets
 
 
+class BrowseHubs(BrowseBase):
+	template_path = 'datafreezer/browse_mid.html'
+	browse_type = 'HUBS'
+
+	def generate_page_title(self):
+		return self.page_title + self.browse_type.title()
+
+	def generate_sections(self):
+		datasets = Dataset.objects.values(
+			'hub_slug'
+		).annotate(
+			upload_count=Count(
+				'hub_slug'
+			)
+		).order_by('-upload_count')
+
+		return [
+			{
+				'count': dataset['upload_count'],
+				'name': get_hub_name_from_slug(dataset['hub_slug']),
+				'slug': dataset['hub_slug']
+			}
+			for dataset in datasets
+		]
+
+		# for dataset in datasets:
+		# 	dataset['hub_name'] = get_hub_name_from_slug(dataset['hub_slug'])
+
+
 class BrowseAuthors(BrowseBase):
 	template_path = 'datafreezer/browse_mid.html'
 	browse_type = 'AUTHORS'
 
 	def generate_page_title(self):
-		return self.page_title + 'Authors'
+		return self.page_title + self.browse_type.title()
 
 	def generate_sections(self):
 		authors = Dataset.objects.values(
@@ -403,7 +465,7 @@ class BrowseTags(BrowseBase):
 	browse_type = 'TAGS'
 
 	def generate_page_title(self):
-		return self.page_title + 'Tags'
+		return self.page_title + self.browse_type.title()
 
 	def generate_sections(self):
 		tags = Tag.objects.all().annotate(
@@ -412,7 +474,7 @@ class BrowseTags(BrowseBase):
 
 		sections = [
 			{
-				'id': tag.slug,
+				'slug': tag.slug,
 				'name': tag.word,
 				'count': tag.dataset_count
 			}
@@ -420,6 +482,37 @@ class BrowseTags(BrowseBase):
 		]
 
 		return sections
+
+
+class BrowseVerticals(BrowseBase):
+	template_path = 'datafreezer/browse_mid.html'
+	browse_type = 'VERTICALS'
+
+	def generate_page_title(self):
+		return self.page_title + self.browse_type.title()
+
+	def generate_sections(self):
+		hub_counts = Dataset.objects.values('hub_slug').annotate(
+			hub_count=Count('hub_slug')
+		)
+		# We don't want to change the original
+		vertical_sections = deepcopy(VERTICAL_HUB_MAP)
+
+		for vertical in vertical_sections:
+			vertical_sections[vertical]['count'] = 0
+			for hub in hub_counts:
+				if hub['hub_slug'] in vertical_sections[vertical]['hubs']:
+					vertical_sections[vertical]['count'] += hub['hub_count']
+
+		return sorted([
+			{
+				'slug': vertical,
+				'name': vertical_sections[vertical]['name'],
+				'count': vertical_sections[vertical]['count']
+			}
+			for vertical in vertical_sections
+		], key=lambda k: k['count'], reverse=True)
+
 
 
 class DetailBase(View):
@@ -434,6 +527,9 @@ class DetailBase(View):
 
 	def get(self, request, slug):
 		matching_datasets = self.generate_matching_datasets(slug)
+
+		if matching_datasets is None:
+			raise Http404("Datasets meeting these criteria do not exist.")
 
 		base_context = {
 			'datasets': matching_datasets,
@@ -498,7 +594,10 @@ class TagDetail(DetailBase):
 
 	def generate_matching_datasets(self, data_slug):
 		tag = Tag.objects.filter(slug=data_slug)
-		return tag[0].dataset_set.all().order_by('-uploaded_by')
+		try:
+			return tag[0].dataset_set.all().order_by('-uploaded_by')
+		except IndexError:
+			return None
 
 	def generate_additional_context(self, matching_datasets):
 		related_tags = Tag.objects.filter(
@@ -509,4 +608,80 @@ class TagDetail(DetailBase):
 
 		return {
 			'related_tags': related_tags
+		}
+
+
+class HubDetail(DetailBase):
+	template_path = 'datafreezer/hub_detail.html'
+
+	def generate_page_title(self, data_slug):
+		return get_hub_name_from_slug(data_slug)
+
+	def generate_matching_datasets(self, data_slug):
+		matching_datasets = Dataset.objects.filter(
+			hub_slug=data_slug
+		).order_by('-date_uploaded')
+
+		if len(matching_datasets) > 0:
+			return matching_datasets
+		else:
+			return None
+
+	def generate_additional_context(self, matching_datasets):
+		top_tags = Tag.objects.filter(
+			dataset__in=matching_datasets
+		).annotate(
+			tag_count=Count('word')
+		).order_by('-tag_count')[:3]
+
+		# foo = [[tag.word, tag.tag_count] for tag in top_tags]
+		# print foo
+
+		# matching_ids = [dataset.id for dataset in matching_datasets]
+
+		top_authors = Dataset.objects.filter(
+			hub_slug=matching_datasets[0].hub_slug
+		).values('uploaded_by').annotate(
+			author_count=Count('uploaded_by')
+		).order_by('-author_count')[:3]
+
+		for author in top_authors:
+			author['fullName'] = grab_names_from_emails([author['uploaded_by']])[author['uploaded_by']]
+
+		# print top_authors
+
+		return {
+			'top_tags': top_tags,
+			'top_authors': top_authors
+		}
+
+class VerticalDetail(DetailBase):
+	template_path = 'datafreezer/vertical_detail.html'
+
+	def generate_page_title(self, data_slug):
+		return get_vertical_name_from_slug(data_slug)
+
+	def generate_matching_datasets(self, data_slug):
+		matching_hubs = VERTICAL_HUB_MAP[data_slug]['hubs']
+		return Dataset.objects.filter(hub_slug__in=matching_hubs)
+
+	def generate_additional_context(self, matching_datasets):
+		top_tags = Tag.objects.filter(
+			dataset__in=matching_datasets
+		).annotate(
+			tag_count=Count('word')
+		).order_by('-tag_count')[:3]
+
+		top_authors = Dataset.objects.filter(
+			id__in=matching_datasets
+		).values('uploaded_by').annotate(
+			author_count=Count('uploaded_by')
+		).order_by('-author_count')[:3]
+
+		for author in top_authors:
+			author['fullName'] = grab_names_from_emails([author['uploaded_by']])[author['uploaded_by']]
+
+		return {
+			'top_tags': top_tags,
+			'top_authors': top_authors
 		}
