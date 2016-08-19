@@ -19,19 +19,19 @@ from datafreezer.forms import DataDictionaryUploadForm, DataDictionaryFieldUploa
 import requests
 from urlparse import urlparse
 from bs4 import BeautifulSoup
-from csv import reader
+from csv import reader, writer
 import json
 
 
 def load_json_endpoint(data_url):
-    return requests.get(data_url).json()
+	return requests.get(data_url).json()
 
 # We can scrape any site that is optimized for social media (graph tags/og)
 HUBS_LIST = load_json_endpoint(
-    getattr(settings, 'HUBS_LIST_URL', '/api/hub/')
+	getattr(settings, 'HUBS_LIST_URL', '/api/hub/')
 )
 STAFF_LIST = load_json_endpoint(
-    getattr(settings, 'STAFF_LIST_URL', '/api/staff/')
+	getattr(settings, 'STAFF_LIST_URL', '/api/staff/')
 )
 
 
@@ -163,34 +163,54 @@ def tag_lookup(request):
 
 @require_http_methods(["GET"])
 def download_data_dictionary(request, dataset_id):
-    dataDict = Dataset.objects.get(pk=dataset_id).data_dictionary
+	dataset = Dataset.objects.get(pk=dataset_id)
+	dataDict = dataset.data_dictionary
+	fields = DataDictionaryField.objects.filter(
+		parent_dict=dataDict
+	).order_by('columnIndex')
 
-    return HttpResponse(dataDict.pk)
+	response = HttpResponse(content_type='text/csv')
+	csvName = slugify(dataset.title + ' data dict') + '.csv'
+	response['Content-Disposition'] = 'attachment; filename=%s' % (csvName)
+
+	csvWriter = writer(response)
+	metaHeader = ['Data Dictionary for %s prepared by %s' % (dataset.title, dataset.uploaded_by)]
+	csvWriter.writerow(metaHeader)
+	trueHeader = ['Column Index', 'Heading', 'Description', 'Data Type']
+	csvWriter.writerow(trueHeader)
+
+	for field in fields:
+		mappedIndex = field.COLUMN_INDEX_CHOICES[field.columnIndex-1][1]
+		csvWriter.writerow(
+			[mappedIndex, field.heading, field.description, field.dataType]
+		)
+
+	return response
 
 
 # @login_required
 # Home page for the application
 def home(request):
-    recent_uploads = Dataset.objects.order_by('-date_uploaded')[:10]
+	recent_uploads = Dataset.objects.order_by('-date_uploaded')[:10]
 
-    email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
-    # print all_staff
+	email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
+	# print all_staff
 
-    emails_names = grab_names_from_emails(email_list)
-    # print emails_names
+	emails_names = grab_names_from_emails(email_list)
+	# print emails_names
 
-    for upload in recent_uploads:
-        for item in emails_names:
-            if upload.uploaded_by == item:
-                upload.fullName = emails_names[item]
+	for upload in recent_uploads:
+		for item in emails_names:
+			if upload.uploaded_by == item:
+				upload.fullName = emails_names[item]
 
-    for upload in recent_uploads:
-        if not hasattr(upload, 'fullName'):
-            upload.fullName = upload.uploaded_by
+	for upload in recent_uploads:
+		if not hasattr(upload, 'fullName'):
+			upload.fullName = upload.uploaded_by
 
-    return render(request, 'datafreezer/home.html',
-        {'recent_uploads': recent_uploads,
-        'heading': 'Most Recent Uploads'})
+	return render(request, 'datafreezer/home.html',
+		{'recent_uploads': recent_uploads,
+		'heading': 'Most Recent Uploads'})
 
 
 # Upload a data set here
@@ -213,6 +233,7 @@ def dataset_upload(request):
 	return render(request, 'datafreezer/upload.html',
 		{'fileUploadForm': fileUploadForm,
 		'formTitle': 'Upload a Dataset'})
+
 
 # Data dictionary form
 def data_dictionary_upload(request, dataset_id):
@@ -273,14 +294,15 @@ def data_dictionary_upload(request, dataset_id):
 		'title': page_title,
 		'hasHeaders': active_dataset.has_headers})
 
+
 # View individual dataset
 def dataset_detail(request, dataset_id):
 	active_dataset = get_object_or_404(Dataset, pk=dataset_id)
 	datadict_id = active_dataset.data_dictionary_id
 	datadict = DataDictionaryField.objects.filter(
-        parent_dict=datadict_id
-        ).order_by('columnIndex')
-    uploader_name = grab_names_from_emails([active_dataset.uploaded_by])
+		parent_dict=datadict_id
+	).order_by('columnIndex')
+	uploader_name = grab_names_from_emails([active_dataset.uploaded_by])
 	tags = Tag.objects.filter(dataset=dataset_id)
 	articles = Article.objects.filter(dataset=dataset_id)
 
@@ -327,17 +349,17 @@ class BrowseBase(View):
 
 
 class BrowseAll(BrowseBase):
-    template_path = 'datafreezer/browse_all.html'
-    browse_type = 'ALL'
+	template_path = 'datafreezer/browse_all.html'
+	browse_type = 'ALL'
 
-    def generate_page_title(self):
-        return self.page_title + 'All'
+	def generate_page_title(self):
+		return self.page_title + 'All'
 
-    def generate_sections(self):
-        datasets = Dataset.objects.all().order_by('-date_uploaded')
-        for dataset in datasets:
-            dataset.fullName = grab_names_from_emails([dataset.uploaded_by])[dataset.uploaded_by]
-        return datasets
+	def generate_sections(self):
+		datasets = Dataset.objects.all().order_by('-date_uploaded')
+		for dataset in datasets:
+			dataset.fullName = grab_names_from_emails([dataset.uploaded_by])[dataset.uploaded_by]
+		return datasets
 
 
 class BrowseAuthors(BrowseBase):

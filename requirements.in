@@ -9,4 +9,3 @@ requests
 wsgiref
 django-formset-js
 beautifulsoup4~=4.5.1
-django-debug-toolbar~=1.5

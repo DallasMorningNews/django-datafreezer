@@ -25,7 +25,7 @@ PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 SECRET_KEY = 'syj)=1)friug7y=_o17riyk!l&@owy-gg8y+lv!(sgj=!hf5+%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True # os.getenv('DEBUG', 'off') == 'on'
+DEBUG = os.getenv('DEBUG_MODE', 'off') == 'on'
 
 ALLOWED_HOSTS = ['*']
 
@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # packages
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # for using {{ MEDIA_URL }}
             ],
         },
     },
@@ -130,9 +131,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
-# STATICFILES_DIRS = (
-#
-# )
+
+# Uploaded files
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'datafreezer/uploads/')
+MEDIA_URL = '/media/'
 
 # Django Debug Toolbar
 # https://django-debug-toolbar.readthedocs.io/en/stable/installation.html
