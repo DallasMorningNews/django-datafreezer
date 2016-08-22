@@ -5,6 +5,7 @@ from django.utils.text import normalize_newlines, slugify
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.template.loader import render_to_string
 from django.core.exceptions import PermissionDenied, ValidationError, ObjectDoesNotExist
 from django.templatetags.static import static
@@ -340,9 +341,58 @@ def dataset_detail(request, dataset_id):
 		'articles': articles})
 
 
+class PaginatedBrowseAll(View):
+	'''Return all Datasets to template ordered by date uploaded.'''
+	template_path = 'datafreezer/browse_all.html'
+	browse_type = 'ALL'
+	page_title = "Browse "
+
+	def generate_page_title(self):
+		return self.page_title + self.browse_type.title()
+
+	def generate_sections(self):
+		datasets = Dataset.objects.all().order_by('-date_uploaded')
+		for dataset in datasets:
+			dataset.fullName = grab_names_from_emails([dataset.uploaded_by])[dataset.uploaded_by]
+		return datasets
+
+	def get(self, request):
+		'''
+		Returns template and context from generate_page_title and
+		generate_sections to populate template.
+		'''
+		sections_list = self.generate_sections()
+
+		sectionsPaginator = Paginator(sections_list, 25)
+
+		page = request.GET.get('page')
+
+		try:
+			sections = sectionsPaginator.page(page)
+		except PageNotAnInteger:
+			# If page is not an integer, deliver first page.
+			sections = sectionsPaginator.page(1)
+		except EmptyPage:
+			# If page is out of range (e.g. 9999), deliver last page of results.
+			sections = sectionsPaginator.page(paginator.num_pages)
+
+		context = {
+			'sections': sections,
+			'page_title': self.generate_page_title(),
+			'browse_type': self.browse_type
+		}
+
+		return render(
+			request,
+			self.template_path,
+			context
+		)
+
+
 class BrowseBase(View):
 	'''Abstracted class for class-based Browse views.'''
 	page_title = "Browse "
+	paginated = False
 
 	def generate_page_title(self):
 		'''
@@ -367,10 +417,38 @@ class BrowseBase(View):
 		'''
 		sections = self.generate_sections()
 
+		if self.paginated:
+			sectionsPaginator = Paginator(sections, 25)
+
+			page = request.GET.get('page')
+
+			try:
+				sections = sectionsPaginator.page(page)
+			except PageNotAnInteger:
+				# If page is not an integer, deliver first page.
+				sections = sectionsPaginator.page(1)
+			except EmptyPage:
+				# If page is out of range (e.g. 9999), deliver last page of results.
+				sections = sectionsPaginator.page(sectionsPaginator.num_pages)
+
+			pageUpper = int(sectionsPaginator.num_pages) / 2
+
+			try:
+				pageLower = int(page) / 2
+			except TypeError:
+				pageLower = -999
+
+
+		else:
+			pageUpper = None
+			pageLower = None
+
 		context = {
 			'sections': sections,
 			'page_title': self.generate_page_title(),
-			'browse_type': self.browse_type
+			'browse_type': self.browse_type,
+			'pageUpper': pageUpper,
+			'pageLower': pageLower
 		}
 
 		return render(
@@ -384,6 +462,7 @@ class BrowseAll(BrowseBase):
 	'''Return all Datasets to template ordered by date uploaded.'''
 	template_path = 'datafreezer/browse_all.html'
 	browse_type = 'ALL'
+	paginated = True
 
 	def generate_page_title(self):
 		return self.page_title + self.browse_type.title()
