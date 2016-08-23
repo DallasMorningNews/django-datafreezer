@@ -219,7 +219,7 @@ def download_data_dictionary(request, dataset_id):
 # @login_required
 # Home page for the application
 def home(request):
-	recent_uploads = Dataset.objects.order_by('-date_uploaded')[:8]
+	recent_uploads = Dataset.objects.order_by('-date_uploaded')[:9]
 
 	email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
 	# print all_staff

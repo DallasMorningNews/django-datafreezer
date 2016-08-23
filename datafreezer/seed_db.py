@@ -7,6 +7,8 @@ from django.utils.text import slugify
 from models import *
 from views import parse_csv_headers, HUBS_LIST, STAFF_LIST
 
+import progressbar
+
 
 FILLER = '''
 Paul Steiger fourth estate horse-race coverage TBD but what's the business model Groupon content farm hyperhyperhyperlocal, Fuego trolls crowdfunding link economy engagement process vs. product, content is king advertising perfect for starting a campfire natural-born blogger information overload natural-born blogger. hyperlocal Robin Sloan Colbert bump bot Fuego West Seattle Blog in the slot curation TweetDeck Journal Register, privacy the medium is the message Jay Rosen media diet gutter pay curtain hackgate collaboration, a giant stack of newspapers that you'll never read +1 Gawker innovation Reuters The Printing Press as an Agent of Change social media TweetDeck.
@@ -93,6 +95,17 @@ def create_dataset_title():
 	return title.title().strip()
 
 
+def choose_source():
+	exclude = set(string.punctuation)
+
+	source = ""
+
+	while source == "":
+		source = FILLER[random.randint(0, len(FILLER)-1)].strip().title()
+		source = ''.join(ch for ch in source if ch not in exclude)
+
+	return source
+
 
 def create_dataset_description(maxLength):
 	desc = ""
@@ -175,7 +188,9 @@ def create_datasets(num_datasets):
 
 	tags = choose_dataset_tags()
 
-	for counter in range(num_datasets):
+	bar = progressbar.ProgressBar()
+
+	for counter in bar(range(num_datasets)):
 		created_dataset = Dataset(
 			title=create_dataset_title(),
 			description=create_dataset_description(100)
@@ -194,13 +209,14 @@ def create_datasets(num_datasets):
 
 		created_dataset.vertical_slug = HUBS_LIST[hubIndex]['vertical']['slug']
 
-		source = FILLER[random.randint(0, len(FILLER)-1)]
+		# source = FILLER[random.randint(0, len(FILLER)-1)]
+		source = choose_source()
 		created_dataset.source = source
 		created_dataset.source_slug = slugify(source)
 
 		created_dataset.save()
 		d_id = created_dataset.id
-		print d_id
+		# print d_id
 
 		datadict = prepare_data_dict(d_id)
 
