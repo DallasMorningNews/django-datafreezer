@@ -1,0 +1,35 @@
+{% extends 'datafreezer/base_detail.html' %}
+
+<!--Header container-->
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block description_text %}
+  <p class="lead">These are the datasets that have been sourced from {{ page_title }}.</p>
+{% endblock description_text %}
+
+<!-- Begin descriptor row -->
+{% block meta_panel %}
+  <dt>Datasets Uploaded</dt>
+  <dd>{{ num_datasets }}</dd>
+  <dt>Related Tags</dt>
+  {% for top_tag in top_tags %}
+    <dd><a href="{% url 'datafreezer_tag_detail' top_tag.slug %}">{{ top_tag.word }}</a></dd>
+  {% endfor %}
+{% endblock meta_panel %}
+<!--End basic meta information-->
+
+  <!-- End row -->
+{% block dataset_table_header %}Datasets sourced from {{ page_title }}{% endblock dataset_table_header %}</h4>
+
+{% block dataset_info %}
+  <div class="col-md-6">
+    <h5>{{ dataset.title }}</h5>
+  </div>
+  <div class="col-md-offset-2 col-md-4">
+    <h5><small>Uploaded on:</small> {{ dataset.date_uploaded|date:"SHORT_DATE_FORMAT" }}</h5>
+  </div>
+{% endblock dataset_info %}
+
+{% block empty_page_text %}
+Sorry, no dataset has been sourced from {{ page_title }}.
+{% endblock empty_page_text %}

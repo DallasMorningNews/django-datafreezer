@@ -118,6 +118,8 @@ class Dataset(models.Model):
 	date_uploaded = models.DateTimeField(default=timezone.now, blank=True)
 	description = models.TextField()
 	uploaded_by = models.EmailField()
+	source = models.CharField(max_length=200)
+	source_slug = models.CharField(max_length=250, blank=True)
 
 	# Date that Dataset begins
 	date_begin = models.DateTimeField(blank=True, null=True)

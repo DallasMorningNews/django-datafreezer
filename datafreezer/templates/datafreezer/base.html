@@ -40,7 +40,7 @@
                 <li><a href="{% url 'datafreezer_browse_tags' %}">Tags</a></li>
 								<li><a href="{% url 'datafreezer_browse_hubs' %}">Hubs</a></li>
 								<li><a href="{% url 'datafreezer_browse_verticals' %}">Verticals</a></li>
-                <li><a href="#">Option2</a></li>
+                <li><a href="{% url 'datafreezer_browse_sources' %}">Sources</a></li>
               </ul>
             </li>
             <li><a href="#">Return to ???</a></li>
@@ -53,12 +53,14 @@
 
     <div id="main" class="container-fluid">
       <div class="container-fluid">
+				{% block heading %}
         <div id="header" class="page-header">
           <h2>
             {% block title %}
             {% endblock title %}
           </h2>
         </div>
+				{% endblock heading %}
         {% block content %}
           {% block no_results_msg %}
             <div class="jumbotron">

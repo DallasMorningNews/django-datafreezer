@@ -30,6 +30,8 @@
 		              <dd><a href="{% url 'datafreezer_vertical_detail' dataset.vertical|slugify %}">{{ dataset.vertical }}</a></dd>
 		              <dt>Hub</dt>
 		              <dd><a href="{% url 'datafreezer_hub_detail' dataset.hub_slug %}">{{ dataset.hub }}</a></dd>
+									<dt>Source</dt>
+									<dd><a href="{% url 'datafreezer_source_detail' dataset.source_slug %}">{{ dataset.source }}</a></dd>
 		              <dt>Tags</dt>
 		              {% for tag in tags %}
 		                <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>

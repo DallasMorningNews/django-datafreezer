@@ -18,6 +18,8 @@
 					<a href="{% url 'datafreezer_hub_detail' section.slug %}">
 				{% elif browse_type == 'VERTICALS' %}
 					<a href="{% url 'datafreezer_vertical_detail' section.slug %}">
+				{% elif browse_type == 'SOURCES' %}
+					<a href="{% url 'datafreezer_source_detail' section.slug %}">
         {% endif %}
           <div class="panel panel-default">
             <div class="panel-body">

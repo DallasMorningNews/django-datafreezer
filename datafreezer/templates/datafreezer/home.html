@@ -75,43 +75,94 @@
     googletag.enableServices();
 </script>
 {%endblock%}
+			{% block heading %}{% endblock heading %}
+		  {% block content %}
+			<br>
+			<div class="jumbotron">
+				<div class="container">
+					<h1>Datafreezer</h1>
+					<p>
+						Datafreezer is a newsroom tool that enables reporters and editors to easily share datasets.
+						To get started, click <b>BROWSE ALL</b> or <b>UPLOAD</b> below to browse saved datasets or upload a dataset.
+					</p>
+					<p><a href="{% url 'datafreezer_browse_all' %}" class="btn btn-primary btn-lg">Browse all</a>
+					<a href="{% url 'datafreezer_upload' %}" class="btn btn-primary btn-lg">Upload</a></p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-4">
+					<div class="list-group">
+					  <a href="{% url 'datafreezer_browse_all' %}" class="list-group-item active">
+					    <h4 class="list-group-item-heading">Browse</h4>
+							<p class="list-group-item-text">Click a subhead to see what other users have uploaded.</p>
+					  </a>
+						<a href="{% url 'datafreezer_browse_all' %}" class="list-group-item">
+							<h4 class="list-group-item-heading">All Uploads</h4>
+							<p class="list-group-item-text">See all uploads.</p>
+						</a>
+						<a href="{% url 'datafreezer_browse_tags' %}" class="list-group-item">
+							<h4 class="list-group-item-heading">Tags</h4>
+							<p class="list-group-item-text">See all uploads grouped by tag.</p>
+						</a>
+						<a href="{% url 'datafreezer_browse_hubs' %}" class="list-group-item">
+							<h4 class="list-group-item-heading">Hubs</h4>
+							<p class="list-group-item-text">See all uploads grouped by hub.</p>
+						</a>
+						<a href="{% url 'datafreezer_browse_verticals' %}" class="list-group-item">
+							<h4 class="list-group-item-heading">Verticals</h4>
+							<p class="list-group-item-text">See all uploads grouped by vertical.</p>
+						</a>
+						<a href="{% url 'datafreezer_browse_authors' %}" class="list-group-item">
+							<h4 class="list-group-item-heading">Authors</h4>
+							<p class="list-group-item-text">See all dataset contributors' uploads.</p>
+						</a>
+					</div>
+				</div>
+				<div class="col-sm-8">
+					<div class="panel panel-default">
+						{% if recent_uploads %}
+							<div class="panel-heading">
+								<h4 class="panel-title">Recent Uploads</h4>
+							</div>
 
-  {% block title %}{{ heading }} <a href="{% url 'datafreezer_browse_all' %}"><small>Click to see all datasets</small></a>{% endblock title %}
-  {%block content%}
-    {% if recent_uploads %}
-      <div class="table-responsive">
-        <table class='table table-hover'>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Date Uploaded</th>
-              <th>Uploader</th>
-              <th>Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for upload in recent_uploads %}
-              <tr>
-                <td>{{ upload.title }}</td>
-                <td>{{ upload.date_uploaded }}</td>
-                <td>{{ upload.fullName }}</td>
-                <td>
-                  <a href="{% url 'datafreezer_dataset_detail' upload.id %}" class="btn btn-primary btn-block" role="button">
-                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
-                  </a>
-              </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      {% block no_results_msg %}
-        {{ block.super }}
-      {% endblock no_results_msg %}
-    </div>
-    {% endif %}
-  {%endblock content%}
+								<table class="table table-hover panel-body">
+									<tbody>
+										<th>
+											Title
+										</th>
+										<th>
+											Uploaded
+										</th>
+										<th>
+											View
+										</th>
+										{% for upload in recent_uploads %}
+										<tr>
+											<td>
+												{{ upload.title }}
+											</td>
+											<td>
+												{{ upload.date_uploaded|date:"N j" }}
+											</td>
+											<td>
+												<a href="{% url 'datafreezer_dataset_detail' upload.id %}" class="btn btn-primary btn-block" role="button">
+													<span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>
+												</a>
+											</td>
+										</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							{% else %}
+								{% block no_results_msg %}
+									{{ block.super }}
+								{% endblock no_results_msg %}
+							{% endif %}
+						</div>
+				</div>
+			</div>
+		  {%endblock content%}
+
 {%block custom_foot%}
 <script type="text/javascript"></script>
 {%endblock%}

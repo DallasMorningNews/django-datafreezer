@@ -64,6 +64,7 @@ def add_dataset(fileUploadForm, request):
 	# Find vertical from hub
 	hub_slug = dataset_upload.hub_slug
 	dataset_upload.vertical_slug = fileUploadForm.get_vertical_from_hub(hub_slug)
+	dataset_upload.source_slug = slugify(dataset_upload.source)
 
 	# Save to database so that we can add Articles,
 	# DataDictionaries, other foreignkeyed/M2M'd models.
@@ -165,7 +166,7 @@ def get_hub_name_from_slug(hub_slug):
 def get_vertical_name_from_slug(vertical_slug):
 	for hub in HUBS_LIST:
 		if hub['vertical']['slug'] == vertical_slug:
-			return hub['vertical']['slug']
+			return hub['vertical']['name']
 
 	return vertical_slug
 
@@ -173,10 +174,19 @@ def get_vertical_name_from_slug(vertical_slug):
 @require_http_methods(["GET"])
 def tag_lookup(request):
 	tag = request.GET['tag']
-	tagSlug = slugify(tag.strip().lower())
-	tagCandidates = Tag.objects.filter(slug__startswith=tagSlug)
-	tags = json.dumps([candidate.word for candidate in tagCandidates])
+	tagSlug = slugify(tag.strip())
+	tagCandidates = Tag.objects.values('word').filter(slug__startswith=tagSlug)
+	tags = json.dumps([candidate['word'] for candidate in tagCandidates])
 	return HttpResponse(tags, content_type='application/json')
+
+
+@require_http_methods(["GET"])
+def source_lookup(request):
+	source = request.GET['source']
+	sourceSlug = slugify(source.strip())
+	sourceCandidates = Dataset.objects.values('source').filter(source_slug__startswith=sourceSlug)
+	sources = json.dumps([cand['source'] for cand in sourceCandidates])
+	return HttpResponse(sources, content_type='application/json')
 
 
 @require_http_methods(["GET"])
@@ -209,7 +219,7 @@ def download_data_dictionary(request, dataset_id):
 # @login_required
 # Home page for the application
 def home(request):
-	recent_uploads = Dataset.objects.order_by('-date_uploaded')[:10]
+	recent_uploads = Dataset.objects.order_by('-date_uploaded')[:8]
 
 	email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
 	# print all_staff
@@ -593,6 +603,27 @@ class BrowseVerticals(BrowseBase):
 		], key=lambda k: k['count'], reverse=True)
 
 
+class BrowseSources(BrowseBase):
+	template_path = 'datafreezer/browse_mid.html'
+	browse_type = 'SOURCES'
+
+	def generate_page_title(self):
+		return self.page_title + self.browse_type.title()
+
+	def generate_sections(self):
+		sources = Dataset.objects.values(
+			'source', 'source_slug'
+		).annotate(source_count=Count('source_slug'))
+
+		return sorted([
+			{
+				'slug': source['source_slug'],
+				'name': source['source'],
+				'count': source['source_count']
+			}
+			for source in sources
+		], key=lambda k: k['count'], reverse=True)
+
 
 class DetailBase(View):
 	def generate_page_title(self, data_slug):
@@ -763,4 +794,25 @@ class VerticalDetail(DetailBase):
 		return {
 			'top_tags': top_tags,
 			'top_authors': top_authors
+		}
+
+
+class SourceDetail(DetailBase):
+	template_path = 'datafreezer/source_detail.html'
+
+	def generate_page_title(self, data_slug):
+		return Dataset.objects.filter(source_slug=data_slug)[0].source
+
+	def generate_matching_datasets(self, data_slug):
+		return Dataset.objects.filter(source_slug=data_slug)
+
+	def generate_additional_context(self, matching_datasets):
+		top_tags = Tag.objects.filter(
+			dataset__in=matching_datasets
+		).annotate(
+			tag_count=Count('word')
+		).order_by('-tag_count')[:3]
+
+		return {
+			'top_tags': top_tags
 		}
