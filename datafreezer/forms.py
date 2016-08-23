@@ -27,7 +27,7 @@ class DataDictionaryUploadForm(ModelForm):
 
 
 class DataDictionaryFieldUploadForm(ModelForm):
-	columnindex = forms.ChoiceField(widget=forms.Select(
+	columnIndex = forms.ChoiceField(widget=forms.Select(
 		attrs={"class": "form-control"}),
 		help_text="What column number/letter is this?",
 		label="Column",

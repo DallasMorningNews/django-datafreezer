@@ -6,10 +6,56 @@
   display: none;
 }
 
-.loading 
+.loading
 {
    background:
      url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif')
      no-repeat
      right center;
+}
+
+#main{
+  margin-top: 100px;
+  margin-left: 80px;
+  margin-right: 80px;
+  margin-bottom: 50px;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+  background-color: white;
+}
+
+#datafreezer-body{
+  background-color: #EAEAEA;
+}
+
+#loginText{
+  margin-right:10px;
+}
+
+.sidebar-nav{
+  list-style: none;
+  border
+}
+
+@media (max-width: 768px){
+  #main{
+    margin-top:35px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+  }
+}
+
+.center{
+	margin: auto;
+}
+
+.drawer{
+	padding: 0px;
+	margin: 0px;
+	width: 100%;
+}
+
+.sidebar{
+	padding: 0px;
+	margin: 0px;
 }

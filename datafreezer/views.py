@@ -270,7 +270,7 @@ def data_dictionary_upload(request, dataset_id):
 		headers = parse_csv_headers(dataset_id)
 		# Would like to have this at beginning of function...
 		DataDictionaryFormSet = formset_factory(DataDictionaryFieldUploadForm,
-			max_num=len(headers))
+			max_num=len(headers), can_delete=True)
 	else:
 		EXTRA_COLUMNS = 25
 		DataDictionaryFormSet = formset_factory(DataDictionaryFieldUploadForm,

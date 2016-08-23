@@ -1,9 +1,176 @@
 {% extends 'datafreezer/base.html' %}
-  {% block title %}{{ title }}{% endblock title %}
 
-  {% block content %}
-  <p class="lead text-muted">Lead help text.Lead help text.Lead help text.Lead help text.</p>
-  <form class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
+{% block title %}{{ title }}{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+	<div class="panel panel-default">
+		<div class="panel-heading">Click a thing click a thing click a thing.</div>
+		<div class="panel-body dictBody">
+			<div class="row-fluid">
+
+				<div class="col-sm-3 drawerContainer">
+					<div class="list-group drawerInside">
+						{% if hasHeaders %} {% for fieldForm in fieldsFormset %}
+						<button type="button" id="drawer-{{ fieldForm.heading.auto_id|cut:"-heading" }}" class="list-group-item">
+							<h6 class="list-group-item-heading">{{ fieldForm.heading.form.initial.heading }}</h6>
+							<p class="list-group-item-text">
+								{% if fieldForm.description.form.initial.description %} {{ fieldForm.description.form.initial.description|truncatechars:50 }} {% else %} Description text... {% endif %}
+							</p>
+						</button>
+						{% endfor %} {% else %}
+						<span></span> {% endif %}
+					</div>
+					<div class="row drawerButtons">
+						<a href="#" class="col-sm-offset-1 col-sm-4 btn btn-primary">Add</a>
+						<a href="#" class="col-sm-offset-2 col-sm-4 btn btn-danger">Delete</a>
+					</div>
+				</div>
+
+				<div class="col-sm-offset-1 col-sm-8 fieldsetCol">
+					<form style="position:relative;" class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
+						{% csrf_token %} {{ fieldsFormset.media }} {{ fieldsFormset.management_form }}
+
+						<div style="height:400px;" class="column-ui">
+
+							{% for fieldForm in fieldsFormset %}
+							<fieldset class="dictFieldset" id="fieldset-{{ fieldForm.heading.auto_id|cut:"-heading" }}">
+								{{ fieldForm.non_field_errors }} {% for field in fieldForm %}
+								<div class="form-group {%if field.errors %}has-errors{%endif%}">
+									{% if field.errors %}
+									<div class="control-group alert alert-dismissible alert-danger">
+										<button type="button" class="close" data-dismiss="alert">&times;</button>
+										<ul class="errorlist">
+											{% for error in field.errors %}
+											<li><strong>{{ error|escape }}</strong></li>
+											{% endfor %}
+										</ul>
+									</div>
+									{% endif %}
+									<label class="col-sm-2 control-label" for="{{ field.name }}">
+										{{ field.label }}
+									</label>
+									<div class="col-sm-10">
+										{{ field }} {% if field.help_text %}
+										<span class="help-block">{{ field.help_text|safe }}</span> {% endif %}
+									</div>
+								</div>
+								{% endfor %}
+							</fieldset>
+							{% endfor %}
+						</div>
+				</div>
+				<div style="clear:both;"></div>
+			</div>
+
+			<div class='row-fluid'>
+				<div class="col-sm-12 rule">
+					<br>
+				</div>
+				<div style="clear:both;"></div>
+			</div>
+
+
+			<div class="row-fluid">
+				<div class="col-sm-12">
+					<fieldset>
+						{% for field in dataDictExtrasForm %}
+						<div class="form-group {%if field.errors %}has-errors{%endif%}">
+							{% if field.errors %}
+							<div class="control-group alert alert-dismissible alert-danger">
+								<button type="button" class="close" data-dismiss="alert">&times;</button>
+								<ul class="errorlist">
+									{% for error in field.errors %}
+									<li><strong>{{ error|escape }}</strong></li>
+									{% endfor %}
+								</ul>
+							</div>
+							{% endif %}
+							<label class="col-sm-2 control-label" for="{{ field.name }}">
+								{{ field.label }}
+							</label>
+							<div class="col-sm-10">
+								{{ field }} {% if field.help_text %}
+								<span class="help-block">{{ field.help_text|safe }}</span> {% endif %}
+							</div>
+							{% endfor %}
+					</fieldset>
+					</div>
+					</form>
+				</div>
+				<div style="clear:both;"></div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script>
+	$(document).ready(function(event) {
+		$('.column-ui > fieldset').hide()
+		$('#fieldset-id_fields-0').show()
+		$('#drawer-id_fields-0').addClass('active');
+		// $('#drawer-id_fields-0').unbind('click');
+
+		$("label[for='DELETE']").css("margin-left", "-500000px")
+			.css("position", "absolute");
+		$("input[id*='DELETE']").css("margin-left", "-500000px")
+			.css("position", "absolute");
+
+	});
+
+	$('.list-group-item').click(function(event) {
+		// $('.list-group-item').bind('click');
+		// $(this).unbind('click');
+		if (!$(this).hasClass('active')) {
+			$('.list-group-item').removeClass('active');
+			$(this).addClass('active');
+			$('.column-ui > fieldset').fadeOut();
+
+			var drawer_id = $(this).attr('id');
+			var fieldset_id = '#fieldset' + drawer_id.substring(6, drawer_id.length);
+			$(fieldset_id).fadeIn(600);
+		}
+	});
+
+
+	$('[id$=description]').on('input', function() {
+		var field_id = $(this).attr('id');
+		var drawer_id = '#drawer-' + field_id.substring(0, field_id.length-12);
+		if ($(this).val().length > 25){
+			$(drawer_id + '> p').text($(this).val().substring(0, 22) + '...');
+		}
+		else if($(this).val().length == 0){
+			$(drawer_id + '> p').text('Description text...');
+		}
+		else{
+			$(drawer_id + '> p').text($(this).val());
+		}
+
+	});
+	//
+	$('[id$=heading]').on('input', function() {
+		var field_id = $(this).attr('id');
+		var drawer_id = '#drawer-' + field_id.substring(0, field_id.length-8);
+
+		if ($(this).val().length > 20){
+			$(drawer_id + '> h6').text($(this).val().substring(0, 17) + '...');
+		}
+		else if($(this).val().length == 0){
+			column_id = "#" + field_id.substring(0, field_id.length-8) + '-columnIndex'
+			$(drawer_id + '> h6').text('Column ' + $(column_id).val());
+		}
+		else{
+			$(drawer_id + '> h6').text($(this).val());
+		}
+
+	});
+
+
+
+</script>
+
+<!-- <form class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
     {% csrf_token %}
 
     {{ fieldsFormset.media }}
@@ -115,8 +282,12 @@
         {% endfor %}
       </div>
 
-      <!-- Empty form template. By wrapping in a script tag, the __prefix__
+-->
+
+<!-- Empty form template. By wrapping in a script tag, the __prefix__
       placeholder can easily be replaced in both attributes and any scripts. -->
+
+<!--
 
       <script type="form-template" data-formset-empty-form>
         {% escapescript %}
@@ -202,8 +373,7 @@
 
     </div>
 
-
-
   {% endif %}
 
+-->
 {% endblock %}
