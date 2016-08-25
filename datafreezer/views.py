@@ -143,7 +143,7 @@ def add_dataset(request, dataset_id=None):
 						article.title = title
 						article.save()
 
-				dataset_upload.appears_in.add(article)
+				dataset_metadata.appears_in.add(article)
 
 			for tag in tag_list:
 				if tag:
@@ -154,11 +154,11 @@ def add_dataset(request, dataset_id=None):
 						defaults={'word': cleanTag}
 					)
 
-					dataset_upload.tags.add(tagToAdd)
+					dataset_metadata.tags.add(tagToAdd)
 
 		return redirect(
 			'datafreezer_datadict_upload',
-			dataset_id=dataset_upload.id
+			dataset_id=dataset_metadata.id
 		)
 
 	return render(

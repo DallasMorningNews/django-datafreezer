@@ -44,16 +44,21 @@
 		    </div>
 		    <!-- End row -->
 	      <div class="row">
-	        <div class="col-md-6">
+	        <div class="col-md-5">
 	          <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button">
 	          Download Dataset
 	          </a>
 	        </div>
-	        <div class="col-md-6">
+	        <div class="col-md-5">
 	          <a href="{% url 'datafreezer_download_data_dictionary' dataset.id %}" class="btn btn-block" role="button">
 	            Download Data Dictionary
 	          </a>
 	        </div>
+					<div class="col-md-2">
+						<a href="{% url 'datafreezer_metadata_edit' dataset.id %}" class="btn btn-block btn-warning" role="button">
+							Edit Dataset
+						</a>
+					</div>
 	      </div>
 			</div>
   	</div>
