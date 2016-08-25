@@ -133,7 +133,7 @@
 
 								});
 
-								var tagField = $( "#id_source" )
+								var sourceField = $( "#id_source" )
 											// don't navigate away from the field on tab when selecting an item
 											.on( "input change", $.debounce(500, false, function( event ) {
 												if ( event.keyCode === $.ui.keyCode.TAB &&
@@ -174,9 +174,28 @@
 											});
 
           $(document).on({
-            ajaxStart: function() { tagField.addClass('loading');  },
-            ajaxStop: function() { tagField.removeClass('loading'); }
+            ajaxStart: function() { tagField.addClass('loading');
+					  												sourceField.addClass('loading');
+																	},
+            ajaxStop: function() { tagField.removeClass('loading');
+					 													sourceField.removeClass('loading');
+																	}
+
+
+
           })
+
+					// html5 chrome "required" attr issue on edit
+					$(document).ready(function(){
+						{% if fileUploadForm.instance.pk %}
+							var pk = {{ fileUploadForm.instance.pk }}
+						{% else %}
+							var pk = null;
+						{% endif %}
+						if(pk){
+							$('#id_dataset_file').removeAttr('required');
+						}
+					});
 
 </script>
 {% endblock %}

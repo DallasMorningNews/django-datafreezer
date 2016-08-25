@@ -27,215 +27,215 @@ eHow iPad app experiment crowdsourcing ProPublica Jay Rosen information wants to
 DMN_URL = 'http://www.dallasnews.com'
 
 def grab_dmn_article_urls(url):
-	resp = requests.get(url)
-	page = resp.content
-	soup = BeautifulSoup(page, 'html.parser')
-	return [link['href'] for link in soup.find_all('a') if link['href'][len(link)-4:] == 'ece']
+    resp = requests.get(url)
+    page = resp.content
+    soup = BeautifulSoup(page, 'html.parser')
+    return [link['href'] for link in soup.find_all('a') if link['href'][len(link)-4:] == 'ece']
 
 
 def scrape_article_title(url):
-	article_req = requests.get(url)
-	if article_req.status_code == 200:
-		# We good. Get the HTML.
-		page = article_req.content
-		soup = BeautifulSoup(page, 'html.parser')
-		#Looking for <meta ... property="og:title">
-		meta_title_tag = soup.find('meta', attrs={'property': 'og:title'})
-		try:
-			# print "Trying og:title..."
-			# print meta_title_tag
-			title = meta_title_tag['content']
-		# TypeError implies meta_title_tag is None
-		# KeyError implies that meta_title_tag does not have a content property.
-		except (TypeError, KeyError):
-			title_tag = soup.find('title')
-			try:
-				# print "Falling back to title..."
-				# print title_tag
-				title = title_tag.text
-			except (TypeError, KeyError):
-				description_tag = soup.find('meta', attrs={'property': 'og:description'})
-				try:
-					# print "Falling back to description..."
-					# print description_tag
-					title = description_tag['content']
-				# Fall back value. Display is handled in models.
-				except (TypeError, KeyError):
-					title = None
-		return title
+    article_req = requests.get(url)
+    if article_req.status_code == 200:
+        # We good. Get the HTML.
+        page = article_req.content
+        soup = BeautifulSoup(page, 'html.parser')
+        #Looking for <meta ... property="og:title">
+        meta_title_tag = soup.find('meta', attrs={'property': 'og:title'})
+        try:
+            # print "Trying og:title..."
+            # print meta_title_tag
+            title = meta_title_tag['content']
+        # TypeError implies meta_title_tag is None
+        # KeyError implies that meta_title_tag does not have a content property.
+        except (TypeError, KeyError):
+            title_tag = soup.find('title')
+            try:
+                # print "Falling back to title..."
+                # print title_tag
+                title = title_tag.text
+            except (TypeError, KeyError):
+                description_tag = soup.find('meta', attrs={'property': 'og:description'})
+                try:
+                    # print "Falling back to description..."
+                    # print description_tag
+                    title = description_tag['content']
+                # Fall back value. Display is handled in models.
+                except (TypeError, KeyError):
+                    title = None
+        return title
 
 
 def prepare_articles():
-	url_list = grab_dmn_article_urls(DMN_URL)
+    url_list = grab_dmn_article_urls(DMN_URL)
 
-	articles = []
-	for url in url_list:
-		url = url.strip()
-		if len(url) > 0:
-			article, created = Article.objects.get_or_create(url=url)
-			if created:
-				article.title = scrape_article_title(url)
-				article.save()
-		articles.append(article)
+    articles = []
+    for url in url_list:
+        url = url.strip()
+        if len(url) > 0:
+            article, created = Article.objects.get_or_create(url=url)
+            if created:
+                article.title = scrape_article_title(url)
+                article.save()
+        articles.append(article)
 
-	return articles
+    return articles
 
 
 def create_dataset_title():
-	title = ""
-	numWords = random.randint(4, 12)
-	exclude = set(string.punctuation)
+    title = ""
+    numWords = random.randint(4, 12)
+    exclude = set(string.punctuation)
 
-	for counter in range(numWords):
-		randIndex = random.randint(0, len(FILLER)-1)
-		word = FILLER[randIndex] + " "
-		word = ''.join(ch for ch in word if ch not in exclude)
-		title += word
+    for counter in range(numWords):
+        randIndex = random.randint(0, len(FILLER)-1)
+        word = FILLER[randIndex] + " "
+        word = ''.join(ch for ch in word if ch not in exclude)
+        title += word
 
-	return title.title().strip()
+    return title.title().strip()
 
 
 def choose_source():
-	exclude = set(string.punctuation)
+    exclude = set(string.punctuation)
 
-	source = ""
+    source = ""
 
-	while source == "":
-		source = FILLER[random.randint(0, len(FILLER)-1)].strip().title()
-		source = ''.join(ch for ch in source if ch not in exclude)
+    while source == "":
+        source = FILLER[random.randint(0, len(FILLER)-1)].strip().title()
+        source = ''.join(ch for ch in source if ch not in exclude)
 
-	return source
+    return source
 
 
 def create_dataset_description(maxLength):
-	desc = ""
-	numWords = random.randint(15, maxLength)
+    desc = ""
+    numWords = random.randint(15, maxLength)
 
-	for counter in range(numWords):
-		randIndex = random.randint(0, len(FILLER)-1)
-		word = FILLER[randIndex] + " "
-		desc += word
+    for counter in range(numWords):
+        randIndex = random.randint(0, len(FILLER)-1)
+        word = FILLER[randIndex] + " "
+        desc += word
 
-	return desc.strip()
+    return desc.strip()
 
 
 def choose_dataset_tags():
-	# available_tags = Tag.objects.all()
+    # available_tags = Tag.objects.all()
 
-	exclude = set(string.punctuation)
+    exclude = set(string.punctuation)
 
-	for counter in range(25):
-		tagWord = FILLER[random.randint(0, len(FILLER)-1)].lower()
-		tagWord = ''.join(ch for ch in tagWord if ch not in exclude)
-		if tagWord is not '':
-			tag = Tag.objects.get_or_create(
-				slug=slugify(tagWord),
-				defaults={
-					'word': tagWord
-				}
-			)
-	# numTags = random.randint(1, available_tags.count())
-	#
-	# tags = []
-	#
-	# for counter in range(numTags):
-	#	 randIndex = random.randint(0, available_tags.count() - 1)
-	#	 if available_tags[randIndex].word not in tags:
-	#		 tags.append(available_tags[randIndex].word)
+    for counter in range(25):
+        tagWord = FILLER[random.randint(0, len(FILLER)-1)].lower()
+        tagWord = ''.join(ch for ch in tagWord if ch not in exclude)
+        if tagWord is not '':
+            tag = Tag.objects.get_or_create(
+                slug=slugify(tagWord),
+                defaults={
+                    'word': tagWord
+                }
+            )
+    # numTags = random.randint(1, available_tags.count())
+    #
+    # tags = []
+    #
+    # for counter in range(numTags):
+    #     randIndex = random.randint(0, available_tags.count() - 1)
+    #     if available_tags[randIndex].word not in tags:
+    #         tags.append(available_tags[randIndex].word)
 
-	return Tag.objects.all()
+    return Tag.objects.all()
 
 
 def choose_dataset_articles(articles):
-	numArticles = random.randint(1, len(articles) / 4)
+    numArticles = random.randint(1, len(articles) / 4)
 
-	chosen_articles = []
+    chosen_articles = []
 
-	for counter in range(numArticles):
-		randIndex = random.randint(0, len(articles) - 1)
-		chosen_articles.append(articles[randIndex])
+    for counter in range(numArticles):
+        randIndex = random.randint(0, len(articles) - 1)
+        chosen_articles.append(articles[randIndex])
 
-	return chosen_articles
+    return chosen_articles
 
 
 def prepare_data_dict(dataset_id):
-	data_dict = DataDictionary(author='tydavis@dallasnews.com')
-	data_dict.save()
+    data_dict = DataDictionary(author='tydavis@dallasnews.com')
+    data_dict.save()
 
-	data = Dataset.objects.get(pk=dataset_id)
-	with open(data.dataset_file.path, 'r') as datasetFile:
-		read = reader(datasetFile, delimiter=',', quotechar='"')
-		headers = next(read)
+    data = Dataset.objects.get(pk=dataset_id)
+    with open(data.dataset_file.path, 'r') as datasetFile:
+        read = reader(datasetFile, delimiter=',', quotechar='"')
+        headers = next(read)
 
-	fields = []
+    fields = []
 
-	col = 0
-	for header in headers:
-		col += 1
-		field = DataDictionaryField(
-			heading=header,
-			description=create_dataset_description(25),
-			dataType="TEXT",
-			columnIndex=col
-		)
-		field.parent_dict = data_dict
-		field.save()
+    col = 0
+    for header in headers:
+        col += 1
+        field = DataDictionaryField(
+            heading=header,
+            description=create_dataset_description(25),
+            dataType="TEXT",
+            columnIndex=col
+        )
+        field.parent_dict = data_dict
+        field.save()
 
-	return data_dict
+    return data_dict
 
 
 def create_datasets(num_datasets):
 
-	tags = choose_dataset_tags()
+    tags = choose_dataset_tags()
 
-	bar = progressbar.ProgressBar()
+    bar = progressbar.ProgressBar()
 
-	for counter in bar(range(num_datasets)):
-		created_dataset = Dataset(
-			title=create_dataset_title(),
-			description=create_dataset_description(100)
-		)
+    for counter in bar(range(num_datasets)):
+        created_dataset = Dataset(
+            title=create_dataset_title(),
+            description=create_dataset_description(100)
+        )
 
 
-		created_dataset.dataset_file = '2016/08/18/neighborhood_crime_zscores.csv'
-		created_dataset.has_headers = True
+        created_dataset.dataset_file = '2016/08/18/neighborhood_crime_zscores.csv'
+        created_dataset.has_headers = True
 
-		# uploaders = ['tydavis@dallasnews.com', 'ajvestal@dallasnews.com', 'jmcclure@dallasnews.com']
+        # uploaders = ['tydavis@dallasnews.com', 'ajvestal@dallasnews.com', 'jmcclure@dallasnews.com']
 
-		created_dataset.uploaded_by = STAFF_LIST[random.randint(0, len(STAFF_LIST)-1)]['email']
+        created_dataset.uploaded_by = STAFF_LIST[random.randint(0, len(STAFF_LIST)-1)]['email']
 
-		hubIndex = random.randint(0, len(HUBS_LIST)-1)
-		created_dataset.hub_slug = HUBS_LIST[hubIndex]['slug']
+        hubIndex = random.randint(0, len(HUBS_LIST)-1)
+        created_dataset.hub_slug = HUBS_LIST[hubIndex]['slug']
 
-		created_dataset.vertical_slug = HUBS_LIST[hubIndex]['vertical']['slug']
+        created_dataset.vertical_slug = HUBS_LIST[hubIndex]['vertical']['slug']
 
-		# source = FILLER[random.randint(0, len(FILLER)-1)]
-		source = choose_source()
-		created_dataset.source = source
-		created_dataset.source_slug = slugify(source)
+        # source = FILLER[random.randint(0, len(FILLER)-1)]
+        source = choose_source()
+        created_dataset.source = source
+        created_dataset.source_slug = slugify(source)
 
-		created_dataset.save()
-		d_id = created_dataset.id
-		# print d_id
+        created_dataset.save()
+        d_id = created_dataset.id
+        # print d_id
 
-		datadict = prepare_data_dict(d_id)
+        datadict = prepare_data_dict(d_id)
 
-		created_dataset.data_dictionary = datadict
+        created_dataset.data_dictionary = datadict
 
-		numTags = random.randint(1, (num_datasets/10))
+        numTags = random.randint(1, (num_datasets/10))
 
-		for counter in range(numTags):
-			tagIndex = random.randint(0, len(tags)-1)
-			created_dataset.tags.add(tags[tagIndex])
+        for counter in range(numTags):
+            tagIndex = random.randint(0, len(tags)-1)
+            created_dataset.tags.add(tags[tagIndex])
 
-		# for tag in tags:
-		# 	tagToAdd, created = Tag.objects.get_or_create(slug=slugify(tag), defaults={'word': tag})
-		# 	created_dataset.tags.add(tagToAdd)
+        # for tag in tags:
+        #     tagToAdd, created = Tag.objects.get_or_create(slug=slugify(tag), defaults={'word': tag})
+        #     created_dataset.tags.add(tagToAdd)
 
-		all_articles = prepare_articles()
-		dataset_articles = choose_dataset_articles(all_articles)
+        all_articles = prepare_articles()
+        dataset_articles = choose_dataset_articles(all_articles)
 
-		for article in dataset_articles:
-			created_dataset.appears_in.add(article)
+        for article in dataset_articles:
+            created_dataset.appears_in.add(article)
 
-		created_dataset.save()
+        created_dataset.save()

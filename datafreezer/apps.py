@@ -7,8 +7,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class DatafreezerConfig(AppConfig):
-	name = 'datafreezer'
-	verbose_name = 'Datafreezer'
+    name = 'datafreezer'
+    verbose_name = 'Datafreezer'
 
-	def ready(self):
-		from datafreezer import signals
+    def ready(self):
+        from datafreezer import signals

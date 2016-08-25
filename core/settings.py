@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # packages
-    'djangoformsetjs',
-    'debug_toolbar',
+    # 'djangoformsetjs',
+    # 'debug_toolbar',
 
     # apps
     'datafreezer',
@@ -59,7 +59,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     # packages
-    'debug_toolbar.middleware.DebugToolbarMiddleware'
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -140,11 +140,11 @@ MEDIA_URL = '/media/'
 # Django Debug Toolbar
 # https://django-debug-toolbar.readthedocs.io/en/stable/installation.html
 
-DEBUG_TOOLBAR_PATCH_SETTINGS = False
-INTERNAL_IPS = [
-    '127.0.0.1',
-    '::1'
-    ]
+# DEBUG_TOOLBAR_PATCH_SETTINGS = False
+# INTERNAL_IPS = [
+#     '127.0.0.1',
+#     '::1'
+#     ]
 
 # Datafreezer Settings
 
