@@ -166,7 +166,6 @@ def add_dataset(request, dataset_id=None):
 		'datafreezer/upload.html',
 		{
 			'fileUploadForm': metadata_form,
-			'formTitle': ''
 		}
 	)
 
@@ -297,13 +296,11 @@ def edit_dataset_metadata(request, dataset_id=None):
 		# create a blank form
 		# Edit
 		if dataset_id:
-			form_title = 'Edit a Dataset'
 			metadata_form = DatasetUploadForm(
 				instance=get_object_or_404(Dataset, pk=dataset_id)
 			)
 		# Upload
 		else:
-			form_title = 'Upload a Dataset'
 			metadata_form = DatasetUploadForm()
 
 		return render(
@@ -311,7 +308,6 @@ def edit_dataset_metadata(request, dataset_id=None):
 			'datafreezer/upload.html',
 			{
 				'fileUploadForm': metadata_form,
-				'formTitle': form_title
 			}
 		)
 
