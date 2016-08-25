@@ -59,86 +59,116 @@ def add_dataset(request, dataset_id=None):
 	# Populate non-form fields
 	if dataset_id:
 		dataset_instance = Dataset.objects.get(pk=dataset_id)
-		print request.FILES
-		fileUploadForm = DatasetUploadForm(
+
+		metadata_form = DatasetUploadForm(
 			request.POST,
 			request.FILES,
 			instance=dataset_instance
 		)
 	else:
-		fileUploadForm = DatasetUploadForm(
+		metadata_form = DatasetUploadForm(
 			request.POST,
 			request.FILES
 		)
 
-	dataset_upload = fileUploadForm.save(commit=False)
+	if metadata_form.is_valid():
+		dataset_metadata = metadata_form.save(commit=False)
 
-	dataset_upload.uploaded_by = request.user.email
-	dataset_upload.slug = slugify(dataset_upload.title)
+		dataset_metadata.uploaded_by = request.user.email
+		dataset_metadata.slug = slugify(dataset_metadata.title)
 
-	# Find vertical from hub
-	hub_slug = dataset_upload.hub_slug
-	dataset_upload.vertical_slug = fileUploadForm.get_vertical_from_hub(hub_slug)
-	dataset_upload.source_slug = slugify(dataset_upload.source)
+		# Find vertical from hub
+		dataset_metadata.vertical_slug = metadata_form.get_vertical_from_hub(
+			dataset_metadata.hub_slug
+		)
+		dataset_metadata.source_slug = slugify(dataset_metadata.source)
 
-	# Save to database so that we can add Articles,
-	# DataDictionaries, other foreignkeyed/M2M'd models.
-	dataset_upload.save()
+		# Save to database so that we can add Articles,
+		# DataDictionaries, other foreignkeyed/M2M'd models.
+		dataset_metadata.save()
 
-	# Create relationships
-	url_list = fileUploadForm.cleaned_data['appears_in'].split(', ')
-	tag_list = fileUploadForm.cleaned_data['tags'].split(', ')
-	print tag_list
+		# Create relationships
+		url_list = metadata_form.cleaned_data['appears_in'].split(', ')
+		tag_list = metadata_form.cleaned_data['tags'].split(', ')
+		print tag_list
 
-	for url in url_list:
-		url = url.strip()
-		if len(url) > 0:
-			article, created = Article.objects.get_or_create(url=url)
-			if created:
-				article_req = requests.get(url)
-				if article_req.status_code == 200:
-					# We good. Get the HTML.
-					page = article_req.content
-					soup = BeautifulSoup(page, 'html.parser')
-					#Looking for <meta ... property="og:title">
-					meta_title_tag = soup.find('meta', attrs={'property': 'og:title'})
-					try:
-						# print "Trying og:title..."
-						# print meta_title_tag
-						title = meta_title_tag['content']
-					# TypeError implies meta_title_tag is None
-					# KeyError implies that meta_title_tag does not have a content property.
-					except (TypeError, KeyError):
-						title_tag = soup.find('title')
+		for url in url_list:
+			url = url.strip()
+
+			if len(url) > 0:
+				article, created = Article.objects.get_or_create(url=url)
+
+				if created:
+					article_req = requests.get(url)
+
+					if article_req.status_code == 200:
+						# We good. Get the HTML.
+						page = article_req.content
+						soup = BeautifulSoup(page, 'html.parser')
+
+						#Looking for <meta ... property="og:title">
+						meta_title_tag = soup.find(
+							'meta',
+							attrs={'property': 'og:title'}
+						)
+
 						try:
-							# print "Falling back to title..."
-							# print title_tag
-							title = title_tag.text
+							# print "Trying og:title..."
+							# print meta_title_tag
+							title = meta_title_tag['content']
 						except (TypeError, KeyError):
-							description_tag = soup.find('meta', attrs={'property': 'og:description'})
+							# TypeError implies meta_title_tag is None;
+							# KeyError implies that meta_title_tag does not
+							# have a content property.
+							title_tag = soup.find('title')
+
 							try:
-								# print "Falling back to description..."
-								# print description_tag
-								title = description_tag['content']
-							# Fall back value. Display is handled in models.
+								# print "Falling back to title..."
+								# print title_tag
+								title = title_tag.text
 							except (TypeError, KeyError):
-								title = None
+								description_tag = soup.find(
+									'meta',
+									attrs={'property': 'og:description'}
+								)
 
-					print title
-					article.title = title
-					article.save()
+								try:
+									# print "Falling back to description..."
+									# print description_tag
+									title = description_tag['content']
+								# Fall back value. Display is handled in models.
+								except (TypeError, KeyError):
+									title = None
 
-			dataset_upload.appears_in.add(article)
+						article.title = title
+						article.save()
 
-		for tag in tag_list:
-			# print tag
-			if tag:
-				cleanTag = tag.strip().lower()
-				tagToAdd, created = Tag.objects.get_or_create(slug=slugify(cleanTag), defaults={'word': cleanTag})
-				dataset_upload.tags.add(tagToAdd)
+				dataset_upload.appears_in.add(article)
 
-	return dataset_upload
+			for tag in tag_list:
+				if tag:
+					cleanTag = tag.strip().lower()
 
+					tagToAdd, created = Tag.objects.get_or_create(
+						slug=slugify(cleanTag),
+						defaults={'word': cleanTag}
+					)
+
+					dataset_upload.tags.add(tagToAdd)
+
+		return redirect(
+			'datafreezer_datadict_upload',
+			dataset_id=dataset_upload.id
+		)
+
+	return render(
+		request,
+		'datafreezer/upload.html',
+		{
+			'fileUploadForm': metadata_form,
+			'formTitle': ''
+		}
+	)
 
 def parse_csv_headers(dataset_id):
 	data = Dataset.objects.get(pk=dataset_id)
@@ -261,35 +291,29 @@ def home(request):
 # Upload a data set here
 def edit_dataset_metadata(request, dataset_id=None):
 	if request.method == 'POST':
-		# create form instance and populate it with data from the request
-		fileUploadForm = DatasetUploadForm(request.POST, request.FILES)
-		# If the form validates, we can create our models:
-		if fileUploadForm.is_valid():
+		return add_dataset(request, dataset_id)
 
-			if dataset_id:
-				dataset_upload = add_dataset(request, dataset_id)
-			else:
-				# dataset_upload = fileUploadForm.save(commit=False)
-				dataset_upload = add_dataset(request)
-
-			return redirect('datafreezer_datadict_upload', dataset_id=dataset_upload.id)
-			# return redirect('datafreezer_datadict_upload', dataset_id=dataset_upload.id)
-
-	else:
+	elif request.method == 'GET':
 		# create a blank form
 		# Edit
 		if dataset_id:
-			active_dataset = get_object_or_404(Dataset, pk=dataset_id)
-			fileUploadForm = DatasetUploadForm(instance=active_dataset)
-			formTitle = 'Edit a Dataset'
+			form_title = 'Edit a Dataset'
+			metadata_form = DatasetUploadForm(
+				instance=get_object_or_404(Dataset, pk=dataset_id)
+			)
 		# Upload
 		else:
-			formTitle = 'Upload a Dataset'
-			fileUploadForm = DatasetUploadForm()
+			form_title = 'Upload a Dataset'
+			metadata_form = DatasetUploadForm()
 
-	return render(request, 'datafreezer/upload.html',
-		{'fileUploadForm': fileUploadForm,
-		'formTitle': formTitle})
+		return render(
+			request,
+			'datafreezer/upload.html',
+			{
+				'fileUploadForm': metadata_form,
+				'formTitle': form_title
+			}
+		)
 
 
 # Data dictionary form

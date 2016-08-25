@@ -1,6 +1,6 @@
 {% extends 'datafreezer/base.html' %}
   {% block title %}
-    {{ formTitle }}
+    {% if fileUploadForm.instance.pk %}Edit{% else %}Upload{% endif %} a Dataset
   {% endblock title %}
   {% block content %}
   <form class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">

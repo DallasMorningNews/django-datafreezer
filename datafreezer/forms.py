@@ -124,7 +124,7 @@ class DatasetUploadForm(ModelForm):
 	dataset_file = forms.FileField(label="File input",
 		validators=[validate_dataset_file],
 		help_text="Upload your file as comma separated values (CSV).",
-		widget=forms.FileInput(attrs={'class': 'form-control'}))
+		widget=forms.ClearableFileInput(attrs={'class': 'form-control'}))
 	has_headers = forms.BooleanField(required=False,
 		label="File headers",
 		help_text="Does the first row of your CSV contain column headers?",
