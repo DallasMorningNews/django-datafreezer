@@ -3,7 +3,7 @@ from django.forms import ModelForm, DateField, DateInput
 from django import forms
 
 from models import *
-from validators import *
+from validators import MultiURLField, MultiTagField, validate_dataset_file
 
 import requests
 from datetime import datetime
@@ -129,7 +129,7 @@ class DatasetUploadForm(ModelForm):
 		label="File headers",
 		help_text="Does the first row of your CSV contain column headers?",
 		widget=forms.CheckboxInput(attrs={'type': 'checkbox'}))
-	tags = forms.CharField(label="Tags",
+	tags = MultiTagField(label="Tags",
 		help_text="Enter terms applicable to this dataset separated by commas. \
 		If your term appears in the dropdown menu, select it.",
 		widget=forms.TextInput(attrs={"class": "form-control"}))

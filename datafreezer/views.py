@@ -53,9 +53,24 @@ def map_hubs_to_verticals():
 
 VERTICAL_HUB_MAP = map_hubs_to_verticals()
 
-def add_dataset(fileUploadForm, request):
+
+def add_dataset(request, dataset_id=None):
 	# Save form to create dataset model
 	# Populate non-form fields
+	if dataset_id:
+		dataset_instance = Dataset.objects.get(pk=dataset_id)
+		print request.FILES
+		fileUploadForm = DatasetUploadForm(
+			request.POST,
+			request.FILES,
+			instance=dataset_instance
+		)
+	else:
+		fileUploadForm = DatasetUploadForm(
+			request.POST,
+			request.FILES
+		)
+
 	dataset_upload = fileUploadForm.save(commit=False)
 
 	dataset_upload.uploaded_by = request.user.email
@@ -71,7 +86,7 @@ def add_dataset(fileUploadForm, request):
 	dataset_upload.save()
 
 	# Create relationships
-	url_list = fileUploadForm.cleaned_data['appears_in']
+	url_list = fileUploadForm.cleaned_data['appears_in'].split(', ')
 	tag_list = fileUploadForm.cleaned_data['tags'].split(', ')
 	print tag_list
 
@@ -156,12 +171,14 @@ def grab_names_from_emails(email_list):
 
 	return emails_names
 
+
 def get_hub_name_from_slug(hub_slug):
 	for hub in HUBS_LIST:
 		if hub['slug'] == hub_slug:
 			return hub['name']
 
 	return hub_slug
+
 
 def get_vertical_name_from_slug(vertical_slug):
 	for hub in HUBS_LIST:
@@ -242,25 +259,37 @@ def home(request):
 
 
 # Upload a data set here
-def dataset_upload(request):
+def edit_dataset_metadata(request, dataset_id=None):
 	if request.method == 'POST':
 		# create form instance and populate it with data from the request
 		fileUploadForm = DatasetUploadForm(request.POST, request.FILES)
-
 		# If the form validates, we can create our models:
 		if fileUploadForm.is_valid():
-			# dataset_upload = fileUploadForm.save(commit=False)
-			dataset_upload = add_dataset(fileUploadForm, request)
+
+			if dataset_id:
+				dataset_upload = add_dataset(request, dataset_id)
+			else:
+				# dataset_upload = fileUploadForm.save(commit=False)
+				dataset_upload = add_dataset(request)
 
 			return redirect('datafreezer_datadict_upload', dataset_id=dataset_upload.id)
 			# return redirect('datafreezer_datadict_upload', dataset_id=dataset_upload.id)
 
 	else:
 		# create a blank form
-		fileUploadForm = DatasetUploadForm()
+		# Edit
+		if dataset_id:
+			active_dataset = get_object_or_404(Dataset, pk=dataset_id)
+			fileUploadForm = DatasetUploadForm(instance=active_dataset)
+			formTitle = 'Edit a Dataset'
+		# Upload
+		else:
+			formTitle = 'Upload a Dataset'
+			fileUploadForm = DatasetUploadForm()
+
 	return render(request, 'datafreezer/upload.html',
 		{'fileUploadForm': fileUploadForm,
-		'formTitle': 'Upload a Dataset'})
+		'formTitle': formTitle})
 
 
 # Data dictionary form
@@ -270,11 +299,11 @@ def data_dictionary_upload(request, dataset_id):
 		headers = parse_csv_headers(dataset_id)
 		# Would like to have this at beginning of function...
 		DataDictionaryFormSet = formset_factory(DataDictionaryFieldUploadForm,
-			max_num=len(headers), can_delete=True)
+			max_num=len(headers), can_delete=True)#, extra=50)
 	else:
-		EXTRA_COLUMNS = 25
+		# EXTRA_COLUMNS = 25
 		DataDictionaryFormSet = formset_factory(DataDictionaryFieldUploadForm,
-			can_delete=True)
+			can_delete=True)#, extra=50)
 
 	if request.method == 'POST':
 		# Save DataDict to Dataset
@@ -283,7 +312,7 @@ def data_dictionary_upload(request, dataset_id):
 		# print request.POST.get("description")
 		fieldsFormset = DataDictionaryFormSet(request.POST, request.FILES, prefix='fields')
 		DataDictionaryExtras = DataDictionaryUploadForm(request.POST, request.FILES, prefix='overall')
-		print request.POST
+		# print request.POST
 		# DataDictionaryExtras =
 		if fieldsFormset.is_valid() and DataDictionaryExtras.is_valid():
 			DataDict = DataDictionaryExtras.save(commit=False)
@@ -291,11 +320,14 @@ def data_dictionary_upload(request, dataset_id):
 			DataDict.save()
 			active_dataset.data_dictionary = DataDict
 			active_dataset.save()
+			formGroups = {}
 			for form in fieldsFormset:
-				field = form.save(commit=False)
-				field.parent_dict = DataDict
-				field.save()
-			return redirect('datafreezer_home')
+				if not form.cleaned_data.get('DELETE'):
+					print form
+					field = form.save()
+					field.parent_dict = DataDict
+					form.save()
+			return redirect('datafreezer_dataset_detail', dataset_id)
 	else:
 		DataDictionaryExtras = DataDictionaryUploadForm(prefix='overall')
 		# No Data Dict in DB. Create!
@@ -310,7 +342,15 @@ def data_dictionary_upload(request, dataset_id):
 					for index in range(len(headers))],
 					prefix='fields')
 			else:
-				fieldsFormset = DataDictionaryFormSet(prefix='fields')
+				fieldsFormset = DataDictionaryFormSet(prefix='fields', initial=[
+					{'columnIndex': index + 1}
+					for index in range(0, 50)
+				])
+
+				for f in fieldsFormset.initial_forms:
+					f.fields['DELETE'].initial = True
+					print f.fields['DELETE'].initial
+
 		# Data Dict has been created already. Separate edit page or edit here?
 		else:
 			# @TODO: fix this

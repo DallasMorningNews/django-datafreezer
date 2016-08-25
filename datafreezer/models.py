@@ -105,7 +105,7 @@ class DataDictionaryField(models.Model):
 								default=TEXT)
 
 	# Relations
-	parent_dict = models.ForeignKey(DataDictionary)
+	parent_dict = models.ForeignKey(DataDictionary, null=True)
 
 	class Meta:
 		verbose_name = 'data dictionary field'

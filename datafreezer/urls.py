@@ -7,9 +7,11 @@ urlpatterns = [
 	url(r'^$', home, name='datafreezer_home'),
 
 	# Upload pages
-	url(r'^upload/$', dataset_upload, name='datafreezer_upload'),
+	url(r'^upload/$', edit_dataset_metadata, name='datafreezer_upload'),
 	url(r'^upload/(?P<dataset_id>\d{1,})/$', data_dictionary_upload,
 		name='datafreezer_datadict_upload'),
+	url(r'^browse/datasets/edit/(?P<dataset_id>\d{1,})/$', edit_dataset_metadata,
+		name='datafreezer_metadata_edit'),
 
 	# Individual dataset detail
 	url(r'^browse/datasets/(?P<dataset_id>\d{1,})/$', dataset_detail,

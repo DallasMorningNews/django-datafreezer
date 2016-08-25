@@ -48,6 +48,21 @@ html, body{
     margin-right: 0px;
     margin-bottom: 0px;
   }
+
+	.dictExtras{
+		padding-top:110px;
+		padding-left:0px;
+		margin-left:0px;
+	}
+
+	.rule{
+		display:none;
+	}
+
+	.fieldsetCol{
+		margin-top: 50px;
+	}
+
 }
 
 .center{
@@ -91,12 +106,6 @@ html, body{
 	margin-top:20px;
 }
 
-@media (max-width:768px){
-	.rule{
-		display:none;
-	}
-}
-
 .dictFieldset{
 	position:absolute;
 	top:0;
@@ -104,4 +113,17 @@ html, body{
 
 .fieldsetCol{
 	padding-top:15px;
+	padding-bottom:0px;
+}
+
+.column-ui > fieldset{
+	display:none;
+}
+
+.column-ui{
+	height:400px;
+}
+
+#empty-drawer-message{
+	display:none;
 }
