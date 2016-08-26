@@ -46,6 +46,11 @@ urlpatterns = [
         download_data_dictionary,
         name='datafreezer_download_data_dictionary'),
 
+    # Generate create table statement
+    url(r'^create_table_sql/(?P<dataset_id>\d{1,})/(?P<sql_dialect>[-\w]+)/$',
+        generate_create_table,
+        name='datafreezer_create_table_sql'),
+
     # JSON endpoints
     url(r'^taglookup/$', tag_lookup,
         name='datafreezer_tag_lookup'),

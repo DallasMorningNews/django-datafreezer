@@ -44,21 +44,21 @@
 		    </div>
 		    <!-- End row -->
 	      <div class="row">
-	        <div class="col-md-5">
-	          <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button">
-	          Download Dataset
-	          </a>
-	        </div>
-	        <div class="col-md-5">
+          <div class="col-md-5">
+            <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button">
+            Download Dataset
+            </a>
+          </div>
+	        <div class="col-md-4">
 	          <a href="{% url 'datafreezer_download_data_dictionary' dataset.id %}" class="btn btn-block" role="button">
 	            Download Data Dictionary
 	          </a>
 	        </div>
-					<div class="col-md-2">
-						<a href="{% url 'datafreezer_metadata_edit' dataset.id %}" class="btn btn-block btn-warning" role="button">
-							Edit Dataset
-						</a>
-					</div>
+          <div class="col-md-3">
+            <a href="{% url 'datafreezer_metadata_edit' dataset.id %}" class="btn btn-block btn-warning" role="button">
+              Edit Dataset
+            </a>
+          </div>
 	      </div>
 			</div>
   	</div>
@@ -66,8 +66,23 @@
 
 <!--Data dictionary information-->
 <div class="container-fluid">
-  <div class="col-md-12">
-    <h4>Data Dictionary <small>What's in this dataset?</small></h4>
+  <div class="row-fluid">
+    <div class="col-md-10">
+      <h4>Data Dictionary <small>What's in this dataset?</small></h4>
+    </div>
+    <div style="float:right;" class="col-md-2">
+      <div class="dropdown">
+        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          Create Table SQL
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a href="{% url 'datafreezer_create_table_sql' dataset.id 'postgresql' %}">PostgreSQL</a></li>
+          <li><a href="{% url 'datafreezer_create_table_sql' dataset.id 'mysql' %}">MySQL</a></li>
+          <li><a href="{% url 'datafreezer_create_table_sql' dataset.id 'sqlite' %}">SQLite</a></li>
+        </ul>
+      </div>
+    </div>
   </div>
   <table class="table table-hover">
     <tbody>
