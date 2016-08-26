@@ -25,6 +25,12 @@ from csv import reader, writer
 from copy import deepcopy
 import json
 
+# for generating create table
+from csvkit import sql
+from csvkit import table
+import StringIO
+
+
 
 def load_json_endpoint(data_url):
     return requests.get(data_url).json()
@@ -172,6 +178,7 @@ def add_dataset(request, dataset_id=None):
             'fileUploadForm': metadata_form,
         }
     )
+
 
 def parse_csv_headers(dataset_id):
     data = Dataset.objects.get(pk=dataset_id)
@@ -426,12 +433,69 @@ def dataset_detail(request, dataset_id):
         uploader_name = active_dataset.uploaded_by
     else:
         uploader_name = uploader_name[active_dataset.uploaded_by]
+
     return render(request, 'datafreezer/dataset_details.html',
         {'dataset': active_dataset,
+        'datadict_id': datadict_id,
         'datadict': datadict,
         'uploader_name': uploader_name,
         'tags': tags,
         'articles': articles})
+
+
+class GenerateCreateTable(View):
+    def get(self, request):
+        data_dict_id = request.GET['data_dict_id']
+        sql_dialect = request.GET['sql_dialect']
+        dataDictionary = get_object_or_404(DataDictionary, pk=data_dict_id)
+        fields = DataDictionaryField.objects.filter(
+            parent_dict=dataDictionary.id
+        ).order_by('columnIndex')
+        fieldFile = ""
+
+        # write first row
+        for index, field in enumerate(fields):
+            fieldFile += "'" + field.heading + "'"
+            if index != len(fields)-1:
+                fieldFile += ','
+            else:
+                fieldFile += '\n'
+
+        # write second row
+        for index, field in enumerate(fields):
+            if field.dataType == 'TEXT':
+                fieldFile += "'Foo'" * 150
+            elif field.dataType == 'NUMBER':
+                fieldFile += '123'
+            elif field.dataType == 'DATE':
+                fieldFile += "'1993-11-04'"
+            elif field.dataType == 'TIME':
+                fieldFile += "'11:11:11'"
+            elif field.dataType == 'DATETIME':
+                fieldFile += "'1993-11-04 11:11:11'"
+            # We'll just treat the default case as TEXT to be safe
+            else:
+                fieldFile += "'Foo'" * 150
+
+            if index != len(fields)-1:
+                fieldFile += ','
+            else:
+                fieldFile += '\n'
+
+        outputFile = StringIO.StringIO()
+
+        outputFile.write(str(fieldFile))
+
+        # return to the beginning of the file
+        outputFile.seek(0)
+
+        csvTable = table.Table.from_csv(outputFile, name=dataDictionary.dataset.title)
+        outputFile.close()
+
+        sqlTable = sql.make_table(csvTable)
+        createTableStatement = sql.make_create_table_statement(sqlTable, dialect=sql_dialect)
+
+        return HttpResponse(createTableStatement)
 
 
 class PaginatedBrowseAll(View):

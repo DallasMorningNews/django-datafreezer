@@ -47,8 +47,8 @@ urlpatterns = [
         name='datafreezer_download_data_dictionary'),
 
     # Generate create table statement
-    url(r'^create_table_sql/(?P<dataset_id>\d{1,})/(?P<sql_dialect>[-\w]+)/$',
-        generate_create_table,
+    url(r'^create_table_sql/$',
+        GenerateCreateTable.as_view(),
         name='datafreezer_create_table_sql'),
 
     # JSON endpoints
