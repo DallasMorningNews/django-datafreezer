@@ -1,8 +1,11 @@
-from django import forms
+# Imports from python.  # NOQA
+import csv
+
+
+# Imports from django.
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-
-import csv
+from django import forms
 
 
 def validate_dataset_file(value):

@@ -1,24 +1,32 @@
-from django.db import models
-from django.utils.text import slugify
-from django.utils import timezone
-import os
-
-from apps import BASE_DIR
-from core.settings import MEDIA_ROOT
-
-import string
+# Imports from python.  # NOQA
 import itertools
+# import os
+import string
+
+
+# Imports from django.
+from django.db import models
+from django.utils import timezone
+# from django.utils.text import slugify
+
+
+# Imports from datafreezer.
+# from datafreezer.apps import BASE_DIR
 
 
 def create_col_nums():
-    colLetters = list(string.ascii_uppercase) + map(''.join, itertools.product(string.ascii_uppercase, repeat=2))
-    letterNums = []
+    column_letters = list(
+        string.ascii_uppercase
+    ) + map(
+        ''.join, itertools.product(string.ascii_uppercase, repeat=2)
+    )
+    letter_numbers = []
     count = 1
-    for letter in colLetters:
-        letterNums.append((count, str(count) + " (" + letter + ")"))
+    for letter in column_letters:
+        letter_numbers.append((count, str(count) + ' (' + letter + ')'))
         count += 1
 
-    return tuple(letterNums)
+    return tuple(letter_numbers)
 
 
 class Tag(models.Model):
@@ -33,7 +41,12 @@ class Tag(models.Model):
 class Article(models.Model):
     url = models.URLField(max_length=500)
     # Serif API:
-    _title = models.CharField(max_length=500, blank=True, null=True, db_column="title")
+    _title = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+        db_column='title'
+    )
     image_url = models.URLField(blank=True, null=True)
 
     def __unicode__(self):
@@ -45,7 +58,7 @@ class Article(models.Model):
     @property
     def title(self):
         if not self._title:
-            return "Dataset sourced in %s" %(self.url)
+            return 'Dataset sourced in {}'.format(self.url)
         else:
             return self._title
 
@@ -64,21 +77,14 @@ class DataDictionary(models.Model):
     attachments = models.FileField(blank=True, null=True)
 
     def __unicode__(self):
-        return "%s's dictionary" %(self.author)
+        return '{}\'s dictionary'.format(self.author)
 
-    class Meta:
+    class Meta:  # NOQA
         verbose_name_plural = 'data dictionaries'
 
 
 class DataDictionaryField(models.Model):
     COLUMN_INDEX_CHOICES = create_col_nums()
-
-    columnIndex = models.IntegerField(choices=COLUMN_INDEX_CHOICES,
-                                    default=COLUMN_INDEX_CHOICES[0][0])
-
-
-    heading = models.CharField(max_length=50)
-    description = models.TextField()
 
     NUMBER = 'NUMBER'
     TEXT = 'TEXT'
@@ -99,15 +105,26 @@ class DataDictionaryField(models.Model):
         (DATETIME, 'Datetime'),
     )
 
+    # TODO(ajv): Change this field name to 'column_index'.
+    columnIndex = models.IntegerField(
+        choices=COLUMN_INDEX_CHOICES,
+        default=COLUMN_INDEX_CHOICES[0][0]
+    )
 
-    dataType = models.CharField(max_length=10,
-                                choices=DATATYPE_CHOICES,
-                                default=TEXT)
+    heading = models.CharField(max_length=50)
+    description = models.TextField()
+
+    # TODO(ajv): Change this field name to 'data_type'.
+    dataType = models.CharField(
+        max_length=10,
+        choices=DATATYPE_CHOICES,
+        default=TEXT
+    )
 
     # Relations
     parent_dict = models.ForeignKey(DataDictionary, null=True)
 
-    class Meta:
+    class Meta:  # NOQA
         verbose_name = 'data dictionary field'
         verbose_name_plural = 'data dictionary fields'
 
