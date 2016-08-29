@@ -31,8 +31,8 @@ from sqlalchemy import Table, Column, Integer, Unicode, MetaData, Text, create_e
 from sqlalchemy.schema import CreateTable
 
 
-
 def load_json_endpoint(data_url):
+    """Return URL endpoint as JSON."""
     return requests.get(data_url).json()
 
 # We can scrape any site that is optimized for social media (graph tags/og)
@@ -45,6 +45,7 @@ STAFF_LIST = load_json_endpoint(
 
 
 def map_hubs_to_verticals():
+    """Return a dictionary of verticals (desks/sections) mapped to hubs (subsections)."""
     vertical_hub_map = {}
     for hub in HUBS_LIST:
         vertical_slug = hub['vertical']['slug']
@@ -62,8 +63,19 @@ VERTICAL_HUB_MAP = map_hubs_to_verticals()
 
 
 def add_dataset(request, dataset_id=None):
-    # Save form to create dataset model
-    # Populate non-form fields
+    """
+    Handles creation of Dataset models from form POST information.
+
+    Called by edit_dataset_metadata(...) view between Dataset entry and Data Dictionary entry.
+    If dataset_id is passed as an argument, this function edits a given dataset
+    rather than adding a dataset. Otherwise, a new model is saved to the database.
+    Adds article URLs and scrapes page for headline, saves tags to DB.
+
+    Returns the same page if validation fails, otherwise returns a redirect to data
+    dictionary creation/edit.
+    """
+# Save form to create dataset model
+# Populate non-form fields
     if dataset_id:
         dataset_instance = Dataset.objects.get(pk=dataset_id)
 
@@ -181,6 +193,7 @@ def add_dataset(request, dataset_id=None):
 
 
 def parse_csv_headers(dataset_id):
+    """Return the first row of a CSV as a list of headers."""
     data = Dataset.objects.get(pk=dataset_id)
     with open(data.dataset_file.path, 'r') as datasetFile:
         csvReader = reader(datasetFile, delimiter=',', quotechar='"')
@@ -191,6 +204,20 @@ def parse_csv_headers(dataset_id):
 
 # Handles multiple emails, returns a dictionary of {email: name}
 def grab_names_from_emails(email_list):
+    """
+    Return a dictionary mapping names to email addresses if the email is found
+    in the staff API/JSON.
+
+    Expects an API of the format =
+    [
+        {
+            'email': 'foo@bar.net',
+            ...
+            'fullName': 'Frank Oo'
+        },
+        ...
+    ]
+    """
     all_staff = STAFF_LIST
 
     emails_names = {}
@@ -213,6 +240,7 @@ def grab_names_from_emails(email_list):
 
 
 def get_hub_name_from_slug(hub_slug):
+    """Return a hub name from its slug."""
     for hub in HUBS_LIST:
         if hub['slug'] == hub_slug:
             return hub['name']
@@ -221,6 +249,7 @@ def get_hub_name_from_slug(hub_slug):
 
 
 def get_vertical_name_from_slug(vertical_slug):
+    """Return a vertical name from its slug."""
     for hub in HUBS_LIST:
         if hub['vertical']['slug'] == vertical_slug:
             return hub['vertical']['name']
@@ -230,6 +259,7 @@ def get_vertical_name_from_slug(vertical_slug):
 
 @require_http_methods(["GET"])
 def tag_lookup(request):
+    """JSON endpoint that returns a list of potential tags for upload template autocomplete."""
     tag = request.GET['tag']
     tagSlug = slugify(tag.strip())
     tagCandidates = Tag.objects.values('word').filter(slug__startswith=tagSlug)
@@ -239,6 +269,7 @@ def tag_lookup(request):
 
 @require_http_methods(["GET"])
 def source_lookup(request):
+    """JSON endpoint that returns a list of potential sources for upload template autocomplete."""
     source = request.GET['source']
     sourceSlug = slugify(source.strip())
     sourceCandidates = Dataset.objects.values('source').filter(source_slug__startswith=sourceSlug)
@@ -248,6 +279,7 @@ def source_lookup(request):
 
 @require_http_methods(["GET"])
 def download_data_dictionary(request, dataset_id):
+    """Generates and returns compiled data dictionary from database as a CSV response."""
     dataset = Dataset.objects.get(pk=dataset_id)
     dataDict = dataset.data_dictionary
     fields = DataDictionaryField.objects.filter(
@@ -276,6 +308,7 @@ def download_data_dictionary(request, dataset_id):
 # @login_required
 # Home page for the application
 def home(request):
+    """Renders Datafreezer homepage. Dynamically includes recent uploads."""
     recent_uploads = Dataset.objects.order_by('-date_uploaded')[:9]
 
     email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
@@ -300,6 +333,7 @@ def home(request):
 
 # Upload a data set here
 def edit_dataset_metadata(request, dataset_id=None):
+    """Renders a template to upload or edit a Dataset. Most of the heavy lifting is done by add_dataset(...)."""
     if request.method == 'POST':
         return add_dataset(request, dataset_id)
 
@@ -325,6 +359,9 @@ def edit_dataset_metadata(request, dataset_id=None):
 
 # Data dictionary form
 def data_dictionary_upload(request, dataset_id):
+    """Renders data dictionary upload page.
+    TKTKTK
+    """
     active_dataset = get_object_or_404(Dataset, pk=dataset_id)
     if active_dataset.has_headers:
         headers = parse_csv_headers(dataset_id)
@@ -384,9 +421,6 @@ def data_dictionary_upload(request, dataset_id):
 
         # Data Dict has been created already. Separate edit page or edit here?
         else:
-            # @TODO: fix this
-            # page_title = 'Edit your data dictionary'
-            # raise Http404("Data dictionary already created.")
             data_dict_instance = DataDictionary.objects.get(dataset__id=dataset_id)
             fields = DataDictionaryField.objects.filter(parent_dict=data_dict_instance)
             page_title = 'Edit Data Dictionary'
@@ -415,6 +449,7 @@ def data_dictionary_upload(request, dataset_id):
 
 # View individual dataset
 def dataset_detail(request, dataset_id):
+    """Renders individual dataset detail page."""
     active_dataset = get_object_or_404(Dataset, pk=dataset_id)
     datadict_id = active_dataset.data_dictionary_id
     datadict = DataDictionaryField.objects.filter(
@@ -444,6 +479,12 @@ def dataset_detail(request, dataset_id):
 
 
 class GenerateCreateTable(View):
+    """
+    Endpoint that generates and returns a CREATE TABLE statement in various flavors of SQL.
+
+    Generates statement based on data dictionary field information entered into DB.
+
+    """
     def get(self, request):
         data_dict_id = request.GET['data_dict_id']
         sql_dialect = request.GET['sql_dialect']
@@ -476,7 +517,9 @@ class GenerateCreateTable(View):
 
 
 class PaginatedBrowseAll(View):
-    '''Return all Datasets to template ordered by date uploaded.'''
+    """Return all Datasets to template ordered by date uploaded.
+
+    """
     template_path = 'datafreezer/browse_all.html'
     browse_type = 'ALL'
     page_title = "Browse "
@@ -524,31 +567,37 @@ class PaginatedBrowseAll(View):
 
 
 class BrowseBase(View):
-    '''Abstracted class for class-based Browse views.'''
+    """Abstracted class for class-based Browse views.
+
+    self.page_title is used to generate the page title shown atop the template.
+    self.paginated indicates whether a page is paginated or not.
+    self.template_path is used in child classes to specify the template used.
+
+    """
     page_title = "Browse "
     paginated = False
 
     def generate_page_title(self):
-        '''
+        """
         Not implemented in base class.
         Child classes return an appropriate page title to template.
-        '''
+        """
         raise NotImplementedError
 
     def generate_sections(self):
-        '''
+        """
         Not implemented in base class.
         Child classes return categories/sections dependent on the type of view.
         For mid-level browse views, these are categorical.
         For all, these sections are simply datasets.
-        '''
+        """
         raise NotImplementedError
 
     def get(self, request):
-        '''
+        """
         Returns template and context from generate_page_title and
         generate_sections to populate template.
-        '''
+        """
         sections = self.generate_sections()
 
         if self.paginated:
@@ -593,15 +642,21 @@ class BrowseBase(View):
 
 
 class BrowseAll(BrowseBase):
-    '''Return all Datasets to template ordered by date uploaded.'''
+    """Return all Datasets to paginated template ordered by date uploaded.
+
+    Child class of BrowseBase.
+
+    """
     template_path = 'datafreezer/browse_all.html'
     browse_type = 'ALL'
     paginated = True
 
     def generate_page_title(self):
+        """Return browse all page title."""
         return self.page_title + self.browse_type.title()
 
     def generate_sections(self):
+        """Return all datasets ordered by date uploaded mapped to uploader name."""
         datasets = Dataset.objects.all().order_by('-date_uploaded')
         for dataset in datasets:
             dataset.fullName = grab_names_from_emails([dataset.uploaded_by])[dataset.uploaded_by]
@@ -609,13 +664,20 @@ class BrowseAll(BrowseBase):
 
 
 class BrowseHubs(BrowseBase):
+    """Return all hubs to which Datasets are linked.
+
+    Child class of BrowseBase.
+
+    """
     template_path = 'datafreezer/browse_mid.html'
     browse_type = 'HUBS'
 
     def generate_page_title(self):
+        """Return browse hub page title."""
         return self.page_title + self.browse_type.title()
 
     def generate_sections(self):
+        """Return all hubs, slugs, and upload counts."""
         datasets = Dataset.objects.values(
             'hub_slug'
         ).annotate(
@@ -638,13 +700,20 @@ class BrowseHubs(BrowseBase):
 
 
 class BrowseAuthors(BrowseBase):
+    """Return all authors to which datasets are linked.
+
+    Child class of BrowseBase.
+
+    """
     template_path = 'datafreezer/browse_mid.html'
     browse_type = 'AUTHORS'
 
     def generate_page_title(self):
+        """Return browse author page title."""
         return self.page_title + self.browse_type.title()
 
     def generate_sections(self):
+        """Return all authors to which datasets have been attributed."""
         authors = Dataset.objects.values(
             'uploaded_by'
         ).annotate(
@@ -674,6 +743,11 @@ class BrowseAuthors(BrowseBase):
 
 
 class BrowseTags(BrowseBase):
+    """Return all tags to which datasets are linked.
+
+    Child class of BrowseBase.
+
+    """
     template_path = 'datafreezer/browse_mid.html'
     browse_type = 'TAGS'
 
@@ -698,6 +772,11 @@ class BrowseTags(BrowseBase):
 
 
 class BrowseVerticals(BrowseBase):
+    """Return all verticals to which datasets are linked.
+
+    Child class of BrowseBase.
+
+    """
     template_path = 'datafreezer/browse_mid.html'
     browse_type = 'VERTICALS'
 
@@ -728,13 +807,20 @@ class BrowseVerticals(BrowseBase):
 
 
 class BrowseSources(BrowseBase):
+    """Return all sources to which datasets are linked.
+
+    Child class of BrowseBase.
+
+    """
     template_path = 'datafreezer/browse_mid.html'
     browse_type = 'SOURCES'
 
     def generate_page_title(self):
+        """Return page title for Browse Sources."""
         return self.page_title + self.browse_type.title()
 
     def generate_sections(self):
+        """Return dictionary of source section slugs, name, and counts."""
         sources = Dataset.objects.values(
             'source', 'source_slug'
         ).annotate(source_count=Count('source_slug'))
@@ -750,16 +836,24 @@ class BrowseSources(BrowseBase):
 
 
 class DetailBase(View):
+    """
+    Base class for mid-level Detail pages. These are aggregate pages.
+
+    """
     def generate_page_title(self, data_slug):
+        """Not implemented in base class. Generates a page title in child classes."""
         raise NotImplementedError
 
     def generate_matching_datasets(self, data_slug):
+        """Not implemented in base class. Generates datasets that match data_slug."""
         raise NotImplementedError
 
     def generate_additional_context(self, matching_datasets):
+        """Not implemented in base class. Generates additional context displayed on page."""
         raise NotImplementedError
 
     def get(self, request, slug):
+        """Basic functionality for GET request to view."""
         matching_datasets = self.generate_matching_datasets(slug)
 
         if matching_datasets is None:
@@ -786,17 +880,27 @@ class DetailBase(View):
 
 
 class AuthorDetail(DetailBase):
+    """
+    Renders author-specific Dataset aggregate page.
+
+    Extends DetailBase.
+
+    """
     template_path = 'datafreezer/author_detail.html'
 
     def generate_page_title(self, data_slug):
+        """Generates remainder of author-specific page-title based on slug (email)."""
         return grab_names_from_emails([data_slug])[data_slug]
 
     def generate_matching_datasets(self, data_slug):
+        """Return datasets that match data_slug (author email)."""
         return Dataset.objects.filter(
             uploaded_by=data_slug
         ).order_by('-date_uploaded')
 
     def generate_additional_context(self, matching_datasets):
+        """Return additional information about matching datasets, including
+        upload counts, related hubs, related tags."""
         dataset_ids = [upload.id for upload in matching_datasets]
         tags = Tag.objects.filter(
             dataset__in=dataset_ids
@@ -820,13 +924,21 @@ class AuthorDetail(DetailBase):
 
 
 class TagDetail(DetailBase):
+    """
+    Renders tag-specific detail page.
+
+    Extends DetailBase.
+
+    """
     template_path = 'datafreezer/tag_detail.html'
 
     def generate_page_title(self, data_slug):
+        """Generates remainder of page title specific to data_slug (tag)."""
         tag = Tag.objects.filter(slug=data_slug)
         return tag[0].word
 
     def generate_matching_datasets(self, data_slug):
+        """Return datasets that match data_slug (tag)."""
         tag = Tag.objects.filter(slug=data_slug)
         try:
             return tag[0].dataset_set.all().order_by('-uploaded_by')
@@ -834,6 +946,7 @@ class TagDetail(DetailBase):
             return None
 
     def generate_additional_context(self, matching_datasets):
+        """Return context about matching datasets."""
         related_tags = Tag.objects.filter(
             dataset__in=matching_datasets
         ).distinct().annotate(
@@ -846,12 +959,20 @@ class TagDetail(DetailBase):
 
 
 class HubDetail(DetailBase):
+    """
+    Renders hub-specific detail page.
+
+    Extends DetailBase.
+
+    """
     template_path = 'datafreezer/hub_detail.html'
 
     def generate_page_title(self, data_slug):
+        """Generates remainder of page title specific to data_slug (hub)."""
         return get_hub_name_from_slug(data_slug)
 
     def generate_matching_datasets(self, data_slug):
+        """Return datasets that match data_slug (hub_slug)."""
         matching_datasets = Dataset.objects.filter(
             hub_slug=data_slug
         ).order_by('-date_uploaded')
@@ -862,16 +983,12 @@ class HubDetail(DetailBase):
             return None
 
     def generate_additional_context(self, matching_datasets):
+        """Return most frequently used tags and top authors for matching datasets."""
         top_tags = Tag.objects.filter(
             dataset__in=matching_datasets
         ).annotate(
             tag_count=Count('word')
         ).order_by('-tag_count')[:3]
-
-        # foo = [[tag.word, tag.tag_count] for tag in top_tags]
-        # print foo
-
-        # matching_ids = [dataset.id for dataset in matching_datasets]
 
         top_authors = Dataset.objects.filter(
             hub_slug=matching_datasets[0].hub_slug
@@ -890,16 +1007,25 @@ class HubDetail(DetailBase):
         }
 
 class VerticalDetail(DetailBase):
+    """
+    Renders vertical-specific detail page.
+
+    Extends DetailBase.
+
+    """
     template_path = 'datafreezer/vertical_detail.html'
 
     def generate_page_title(self, data_slug):
+        """Generate remainder of page title from data_slug (vertical slug)."""
         return get_vertical_name_from_slug(data_slug)
 
     def generate_matching_datasets(self, data_slug):
+        """Return datasets that belong to a vertical by querying a vertical's hubs."""
         matching_hubs = VERTICAL_HUB_MAP[data_slug]['hubs']
         return Dataset.objects.filter(hub_slug__in=matching_hubs)
 
     def generate_additional_context(self, matching_datasets):
+        """Generate top tags and authors for a given Vertical."""
         top_tags = Tag.objects.filter(
             dataset__in=matching_datasets
         ).annotate(
@@ -922,15 +1048,23 @@ class VerticalDetail(DetailBase):
 
 
 class SourceDetail(DetailBase):
+    """Render a source-specific detail page.
+
+    Extends DetailBase.
+
+    """
     template_path = 'datafreezer/source_detail.html'
 
     def generate_page_title(self, data_slug):
+        """Generates remainder of page title based on data_slug (source)."""
         return Dataset.objects.filter(source_slug=data_slug)[0].source
 
     def generate_matching_datasets(self, data_slug):
+        """Return datasets that match data_slug (source_slug)."""
         return Dataset.objects.filter(source_slug=data_slug)
 
     def generate_additional_context(self, matching_datasets):
+        """Return top tags for a source."""
         top_tags = Tag.objects.filter(
             dataset__in=matching_datasets
         ).annotate(
