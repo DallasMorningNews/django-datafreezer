@@ -80,7 +80,8 @@ class DataDictionaryField(models.Model):
     heading = models.CharField(max_length=50)
     description = models.TextField()
 
-    NUMBER = 'NUMBER'
+    INTEGER = 'INTEGER'
+    FLOAT = 'FLOAT'
     TEXT = 'TEXT'
     LONGTEXT = 'LONGTEXT'
     # Date no time
@@ -91,7 +92,8 @@ class DataDictionaryField(models.Model):
     DATETIME = 'DATETIME'
 
     DATATYPE_CHOICES = (
-        (NUMBER, 'Number'),
+        (INTEGER, 'Integer'),
+        (FLOAT, 'Decimal'),
         (TEXT, 'Text'),
         (LONGTEXT, 'Longtext'),
         (DATE, 'Date'),

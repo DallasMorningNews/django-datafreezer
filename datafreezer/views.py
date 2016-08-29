@@ -17,6 +17,7 @@ from django import forms
 
 from datafreezer.models import Dataset, Article, Tag, DataDictionary, DataDictionaryField
 from datafreezer.forms import DataDictionaryUploadForm, DataDictionaryFieldUploadForm, DatasetUploadForm
+from datafreezer.helper import get_db_type_from_text, get_connection_string
 
 import requests
 from urlparse import urlparse
@@ -26,9 +27,8 @@ from copy import deepcopy
 import json
 
 # for generating create table
-from csvkit import sql
-from csvkit import table
-import StringIO
+from sqlalchemy import Table, Column, Integer, Unicode, MetaData, Text, create_engine
+from sqlalchemy.schema import CreateTable
 
 
 
@@ -380,7 +380,7 @@ def data_dictionary_upload(request, dataset_id):
 
                 for f in fieldsFormset.initial_forms:
                     f.fields['DELETE'].initial = True
-                    print f.fields['DELETE'].initial
+                    # print f.fields['DELETE'].initial
 
         # Data Dict has been created already. Separate edit page or edit here?
         else:
@@ -451,50 +451,27 @@ class GenerateCreateTable(View):
         fields = DataDictionaryField.objects.filter(
             parent_dict=dataDictionary.id
         ).order_by('columnIndex')
-        fieldFile = ""
 
-        # write first row
-        for index, field in enumerate(fields):
-            fieldFile += "'" + field.heading + "'"
-            if index != len(fields)-1:
-                fieldFile += ','
-            else:
-                fieldFile += '\n'
+        cols = [
+            {
+                'name': field.heading,
+                'type': get_db_type_from_text(field.dataType)
+            }
+            for field in fields
+        ]
 
-        # write second row
-        for index, field in enumerate(fields):
-            if field.dataType == 'TEXT':
-                fieldFile += "'Foo'" * 150
-            elif field.dataType == 'NUMBER':
-                fieldFile += '123'
-            elif field.dataType == 'DATE':
-                fieldFile += "'1993-11-04'"
-            elif field.dataType == 'TIME':
-                fieldFile += "'11:11:11'"
-            elif field.dataType == 'DATETIME':
-                fieldFile += "'1993-11-04 11:11:11'"
-            # We'll just treat the default case as TEXT to be safe
-            else:
-                fieldFile += "'Foo'" * 150
+        e = create_engine(get_connection_string(sql_dialect))
 
-            if index != len(fields)-1:
-                fieldFile += ','
-            else:
-                fieldFile += '\n'
+        newTable = Table(dataDictionary.dataset.title,
+            MetaData(bind=e),
+            *(Column(col['name'], col['type'])
+                for col in cols
+            )  # noqa
+        )
 
-        outputFile = StringIO.StringIO()
+        createTableStatement = CreateTable(newTable)
 
-        outputFile.write(str(fieldFile))
-
-        # return to the beginning of the file
-        outputFile.seek(0)
-
-        csvTable = table.Table.from_csv(outputFile, name=dataDictionary.dataset.title)
-        outputFile.close()
-
-        sqlTable = sql.make_table(csvTable)
-        createTableStatement = sql.make_create_table_statement(sqlTable, dialect=sql_dialect)
-
+        print createTableStatement
         return HttpResponse(createTableStatement)
 
 

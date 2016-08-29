@@ -175,5 +175,32 @@ $('#postgres').on('click', function() {
     $('#sql-create-table').html(data);
   });
 })
+
+$('#mysql').on('click', function() {
+  $.ajax('{% url 'datafreezer_create_table_sql' %}', {
+    type: 'GET',
+    data:
+      {
+        data_dict_id: '{{ datadict_id }}',
+        sql_dialect: 'mysql'
+      }
+  }).done(function (data) {
+    $('#sql-create-table').html(data);
+  });
+})
+
+$('#sqlite').on('click', function() {
+  $.ajax('{% url 'datafreezer_create_table_sql' %}', {
+    type: 'GET',
+    data:
+      {
+        data_dict_id: '{{ datadict_id }}',
+        sql_dialect: 'sqlite'
+      }
+  }).done(function (data) {
+    $('#sql-create-table').html(data);
+  });
+})
+
 </script>
 {% endblock scripts %}
