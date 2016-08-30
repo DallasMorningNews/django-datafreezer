@@ -12,6 +12,16 @@ from djangoformsetjs.utils import formset_media_js
 
 
 class DataDictionaryUploadForm(ModelForm):
+    """Treated as extras/overall information for Data Dictionary.
+
+    User can eventually upload a data dictionary of their own through here
+    and it will supplant DataDictionaryFields.
+
+    The meat of the DataDictionary will be colleted via DataDictionaryFieldUploadForms.
+
+    Note: .form-control is for Bootstrap-styled forms.
+
+    """
     notes = forms.CharField(required=False,
         help_text="Is there anything else we should know about this dataset?",
         label="Dataset notes",
@@ -27,6 +37,13 @@ class DataDictionaryUploadForm(ModelForm):
 
 
 class DataDictionaryFieldUploadForm(ModelForm):
+    """One DataDictionaryFieldUploadForm represents one column in the original dataset.
+
+    Multiple DataDictionaryFieldUploadForms are generated via inline formsets.
+
+    Users can add and delete forms from the formset to describe whatever columns they'd like.
+
+    """
     columnIndex = forms.ChoiceField(widget=forms.Select(
         attrs={"class": "form-control"}),
         help_text="What column number/letter is this?",
@@ -58,7 +75,15 @@ class DataDictionaryFieldUploadForm(ModelForm):
 
 
 class DatasetUploadForm(ModelForm):
+    """Collects metadata for Dataset.
+
+    Years for date_begin and date_end are set on an automatic 100-year interval.
+
+    """
+
+
     def clean(self):
+        """Verifies that beginning date is before ending date."""
         cleaned_data = super(DatasetUploadForm, self).clean()
         date_begin = self.cleaned_data.get('date_begin')
         date_end = self.cleaned_data.get('date_end')
@@ -74,8 +99,8 @@ class DatasetUploadForm(ModelForm):
     hubs_json = requests.get('http://datalab.dallasnews.com/staff/api/hub/').json()
     HUBS_CHOICES = ((hub['slug'], hub['name']) for hub in hubs_json)
 
-    START_YR = 1900
     END_YR = datetime.now().year
+    START_YR = END_YR - 100
     YEARS = [yr for yr in range(START_YR, END_YR+1)]
 
     def get_vertical_from_hub(self, hub_slug):

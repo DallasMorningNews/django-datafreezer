@@ -308,7 +308,7 @@ def download_data_dictionary(request, dataset_id):
 # @login_required
 # Home page for the application
 def home(request):
-    """Renders Datafreezer homepage. Dynamically includes recent uploads."""
+    """Renders Datafreezer homepage. Includes recent uploads."""
     recent_uploads = Dataset.objects.order_by('-date_uploaded')[:9]
 
     email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
@@ -534,10 +534,10 @@ class PaginatedBrowseAll(View):
         return datasets
 
     def get(self, request):
-        '''
+        """
         Returns template and context from generate_page_title and
         generate_sections to populate template.
-        '''
+        """
         sections_list = self.generate_sections()
 
         sectionsPaginator = Paginator(sections_list, 25)

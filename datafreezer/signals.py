@@ -5,10 +5,3 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
 from models import *
-
-
-def foo(sender, **kwargs):
-    # print "Received!"
-    pass
-
-post_save.connect(foo, sender=Dataset, weak=True, dispatch_uid=None)
