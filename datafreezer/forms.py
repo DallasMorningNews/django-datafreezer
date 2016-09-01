@@ -62,7 +62,7 @@ class DataDictionaryFieldUploadForm(ModelForm):
         choices=DataDictionaryField.COLUMN_INDEX_CHOICES
     )
     heading = forms.CharField(
-        required=False,
+        required=True,
         max_length=100,
         help_text='What is the name of this column?',
         widget=forms.TextInput(

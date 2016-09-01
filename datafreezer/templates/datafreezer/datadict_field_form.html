@@ -1,0 +1,25 @@
+{% if form.errors %}
+<div class="alert alert-danger">
+    Please fix the errors below.
+</div>
+{% endif %}
+
+{% for field in form.visible_fields %}
+<div class="field-group{% if field.errors %} has-error{% endif %}">
+    <div class="col-md-3 col-sm-4 control-label">
+        {{ field.label_tag }}
+    </div>
+
+    <div class="col-md-9 col-sm-8">
+        {{ field }}
+
+        {% if field.help_text %}
+        <span class="help-block">{{ field.help_text|safe }}{% for error in field.errors %} <strong>{{ error }}</strong>{% endfor %}</p>
+        {% endif %}
+    </div>
+
+    <div style="clear: both;"></div>
+</div>
+{% endfor %}
+
+{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}

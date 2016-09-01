@@ -51,6 +51,7 @@ INSTALLED_APPS = [
 
     # apps
     'datafreezer',
+    'dynamic_formsets',
 ]
 
 MIDDLEWARE = [
