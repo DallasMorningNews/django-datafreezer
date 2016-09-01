@@ -17,6 +17,7 @@ from datafreezer.views import (
     BrowseTags,
     BrowseVerticals,
     data_dictionary_upload,
+    DataDictionaryEditView,
     dataset_detail,
     download_data_dictionary,
     edit_dataset_metadata,
@@ -43,6 +44,11 @@ urlpatterns = [
         r'^upload/(?P<dataset_id>\d{1,})/$',
         data_dictionary_upload,
         name='datafreezer_datadict_upload'
+    ),
+    url(
+        r'^edit/(?P<dataset_id>\d+)/change-dictionary/$',
+        DataDictionaryEditView.as_view(),
+        name='datafreezer_datadict_edit'
     ),
     url(
         r'^browse/datasets/edit/(?P<dataset_id>\d{1,})/$',

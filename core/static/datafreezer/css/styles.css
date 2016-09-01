@@ -1,3 +1,8 @@
+html, body{
+    height:100%;
+    width:100%;
+}
+
 .errorlist{
   list-style: none;
 }
@@ -43,19 +48,82 @@
     margin-right: 0px;
     margin-bottom: 0px;
   }
+
+	.dictExtras{
+		padding-top:110px;
+		padding-left:0px;
+		margin-left:0px;
+	}
+
+	.rule{
+		display:none;
+	}
+
+	.fieldsetCol{
+		margin-top: 50px;
+	}
+
 }
 
 .center{
 	margin: auto;
 }
 
-.drawer{
-	padding: 0px;
-	margin: 0px;
-	width: 100%;
+.dictBody{
+	padding-top:0px;
 }
 
-.sidebar{
-	padding: 0px;
-	margin: 0px;
+.drawerContainer{
+	margin: 10px 0px 0px 0px;
+	padding:0px;
+	height:360px;
+	/*overflow-y:hidden;*/
+}
+
+.drawerInside{
+	height:100%;
+	width:100%;
+	/*padding-right:10px;
+	padding-top:10px;
+	padding-bottom:0px;*/
+	padding:0px;
+	overflow:scroll;
+	overflow-x:hidden;
+	margin-bottom:0px;
+}
+
+.drawerButtons{
+	/*background-color: black;*/
+	text-align:center;
+	padding: 10px 0px 0px 0px;
+	margin-right:0px;
+}
+
+.rule{
+	background-color:whitesmoke;
+	width:100%;
+	height:5px;
+	margin-top:20px;
+}
+
+.dictFieldset{
+	position:absolute;
+	top:0;
+}
+
+.fieldsetCol{
+	padding-top:15px;
+	padding-bottom:0px;
+}
+
+.column-ui > fieldset{
+	display:none;
+}
+
+.column-ui{
+	height:400px;
+}
+
+#empty-drawer-message{
+	display:none;
 }

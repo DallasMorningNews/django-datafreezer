@@ -3,10 +3,19 @@
 <!--Header container-->
 {% block title %}{% endblock title %}
 
+{% block custom_head %}
+    <style type="text/css">
+        .dataset-detail {
+            background-color: #FFFFFF;
+            padding: 1.5rem 1rem 0.5rem;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 
   <!-- Begin descriptor row -->
-  <div class="container-fluid">
+  <div class="dataset-detail container-fluid">
     <!-- Row begins -->
     {% if datasets|length > 0 %}
     <div class="row-fluid">

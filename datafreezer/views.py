@@ -22,7 +22,7 @@ from django.db.models import Count
 # from django import forms
 from django.forms import (
     formset_factory,  # NOQA
-    # modelformset_factory
+    inlineformset_factory,
 )
 from django.http import (
     HttpResponse,  # NOQA
@@ -127,6 +127,13 @@ def add_dataset(request, dataset_id=None):
         url_list = metadata_form.cleaned_data['appears_in'].split(', ')
         tag_list = metadata_form.cleaned_data['tags'].split(', ')
         # print(tag_list)
+
+        dictionary = DataDictionary()
+        dictionary.author = request.user.email
+        dictionary.save()
+
+        dataset_metadata.data_dictionary = dictionary
+        dataset_metadata.save()
 
         for url in url_list:
             url = url.strip()
@@ -358,6 +365,90 @@ def edit_dataset_metadata(request, dataset_id=None):
             'datafreezer/upload.html',
             {
                 'fileUploadForm': metadata_form,
+            }
+        )
+
+
+class DataDictionaryEditView(View):
+    """Edit/create view for each dataset's data dictionary."""
+    def get(self, request, dataset_id):
+        active_dataset = get_object_or_404(Dataset, pk=dataset_id)
+
+        data_dictionary = None
+        if active_dataset.data_dictionary is not None:
+            data_dictionary = active_dataset.data_dictionary
+
+        DictFieldsFormSet = inlineformset_factory(
+            DataDictionary,
+            DataDictionaryField,
+            form=DataDictionaryFieldUploadForm,
+            extra=0
+        )
+
+        formset = DictFieldsFormSet(instance=data_dictionary)
+
+        ExtraFormSet = inlineformset_factory(
+            DataDictionary,
+            DataDictionaryField,
+            form=DataDictionaryFieldUploadForm,
+            extra=1
+        )
+
+        extra_formset = ExtraFormSet()
+
+        return render(
+            request,
+            'datafreezer/datadict_edit.html',
+            {
+                # 'fieldsFormset': fieldsFormset,
+                # 'dataDictExtrasForm': DataDictionaryExtras,
+                # 'title': page_title,
+                # 'hasHeaders': active_dataset.has_headers,
+                'ds': active_dataset,
+                'formset': formset,
+                'extra_formset': extra_formset,
+            }
+        )
+
+    def post(self, request, dataset_id):
+        active_dataset = get_object_or_404(Dataset, pk=dataset_id)
+
+        data_dictionary = None
+        if active_dataset.data_dictionary is not None:
+            data_dictionary = active_dataset.data_dictionary
+
+        DictFieldsFormSet = inlineformset_factory(
+            DataDictionary,
+            DataDictionaryField,
+            form=DataDictionaryFieldUploadForm,
+            extra=0
+        )
+
+        formset = DictFieldsFormSet(
+            request.POST,
+            request.FILES,
+            instance=data_dictionary,
+        )
+
+        if formset.is_valid():
+            print(1)
+            formset.save()
+
+            return redirect('datafreezer_dataset_detail', dataset_id)
+
+        print(formset.errors)
+
+        return render(
+            request,
+            'datafreezer/datadict_edit.html',
+            {
+                # 'fieldsFormset': fieldsFormset,
+                # 'dataDictExtrasForm': DataDictionaryExtras,
+                # 'title': page_title,
+                # 'hasHeaders': active_dataset.has_headers,
+                'ds': active_dataset,
+                'formset': formset,
+                'formset_shown': formset,
             }
         )
 

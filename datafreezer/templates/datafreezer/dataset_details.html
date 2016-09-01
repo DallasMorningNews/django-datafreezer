@@ -3,115 +3,131 @@
 <!--Header container-->
 {% block title %}{{ dataset.title }}{% endblock title %}
 
+{% block custom_head %}
+    <style type="text/css">
+        .dataset-description {
+            background: #FFFFFF;
+            padding: 1rem 1rem;
+        }
+
+        .actions {
+            margin: 2.5rem 0 3rem;
+        }
+
+        .actions .spacer {
+            height: 0.75rem;
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
 
-  <!-- Begin descriptor row -->
-		<div class="jumbotron">
-		  <div class="container">
-		    <!-- Row begins -->
-		    <div class="row">
-		      <div class="col-md-5">
-		        <p class="lead">{{ dataset.description }}</p>
-		      </div>
-		      <!--Basic meta information-->
-		      <div class="col-md-7">
-		        <dl class="dl-horizontal">
-		          <div class="panel panel-default">
-		            <div class="panel-body">
-		              {% if dataset.date_begin != None and dataset.date_end != None %}
-		                <dt>Date range</dt>
-		                <dd>{{ dataset.date_begin|date:"N d, Y" }} - {{ dataset.date_end|date:"N d, Y" }}</dd>
-		              {% endif %}
-		              <dt>Date uploaded</dt>
-		              <dd>{{ dataset.date_uploaded }}</dd>
-		              <dt>Uploaded by</dt>
-		              <dd><a href="{% url 'datafreezer_author_detail' dataset.uploaded_by %}">{{ uploader_name }}</a></dd>
-		              <dt>Vertical</dt>
-		              <dd><a href="{% url 'datafreezer_vertical_detail' dataset.vertical|slugify %}">{{ dataset.vertical }}</a></dd>
-		              <dt>Hub</dt>
-		              <dd><a href="{% url 'datafreezer_hub_detail' dataset.hub_slug %}">{{ dataset.hub }}</a></dd>
-									<dt>Source</dt>
-									<dd><a href="{% url 'datafreezer_source_detail' dataset.source_slug %}">{{ dataset.source }}</a></dd>
-		              <dt>Tags</dt>
-		              {% for tag in tags %}
-		                <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>
-		              {% endfor %}
-		            </div>
-		          </div>
-		        </dl>
-		      </div>
-		      <!--End basic meta information-->
-		    </div>
-		    <!-- End row -->
-	      <div class="row">
-	        <div class="col-md-5">
-	          <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button">
-	          Download Dataset
-	          </a>
-	        </div>
-	        <div class="col-md-5">
-	          <a href="{% url 'datafreezer_download_data_dictionary' dataset.id %}" class="btn btn-block" role="button">
-	            Download Data Dictionary
-	          </a>
-	        </div>
-					<div class="col-md-2">
-						<a href="{% url 'datafreezer_metadata_edit' dataset.id %}" class="btn btn-block btn-warning" role="button">
-							Edit Dataset
-						</a>
-					</div>
-	      </div>
-			</div>
-  	</div>
-  <!-- End descriptor row -->
+<div class="dataset-description">
+    <div class="jumbotron">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5">
+                    <p class="lead">{{ dataset.description }}</p>
+                </div>
 
-<!--Data dictionary information-->
-<div class="container-fluid">
-  <div class="col-md-12">
-    <h4>Data Dictionary <small>What's in this dataset?</small></h4>
-  </div>
-  <table class="table table-hover">
-    <tbody>
-			<th>Column Index</th>
-      <th>Heading</th>
-      <th>Description</th>
-      <th>Data Type</th>
-        {% for field in datadict %}
-          <tr>
-						<td>{{ field.columnIndex }}</td>
-            <td>{{ field.heading }}</td>
-            <td>{{ field.description }}</td>
-            <td>{{ field.dataType }}</td>
-          </tr>
-        {% endfor %}
-    </tbody>
-  </table>
-</div>
-<!--End data dictionary information-->
+                <div class="col-md-7">
+                    <dl class="dl-horizontal">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                            {% if dataset.date_begin != None and dataset.date_end != None %}
+                                <dt>Date range</dt>
+                                <dd>{{ dataset.date_begin|date:"N d, Y" }} - {{ dataset.date_end|date:"N d, Y" }}</dd>
+                            {% endif %}
+                                <dt>Date uploaded</dt>
+                                <dd>{{ dataset.date_uploaded }}</dd>
+                                <dt>Uploaded by</dt>
+                                <dd><a href="{% url 'datafreezer_author_detail' dataset.uploaded_by %}">{{ uploader_name }}</a></dd>
+                                <dt>Vertical</dt>
+                                <dd><a href="{% url 'datafreezer_vertical_detail' dataset.vertical|slugify %}">{{ dataset.vertical }}</a></dd>
+                                <dt>Hub</dt>
+                                <dd><a href="{% url 'datafreezer_hub_detail' dataset.hub_slug %}">{{ dataset.hub }}</a></dd>
+                                <dt>Source</dt>
+                                <dd><a href="{% url 'datafreezer_source_detail' dataset.source_slug %}">{{ dataset.source }}</a></dd>
+                                <dt>Tags</dt>
+                            {% for tag in tags %}
+                                <dd><a href="{% url 'datafreezer_tag_detail' tag.slug %}">{{ tag.word }}</a></dd>
+                            {% endfor %}
+                            </div>
+                        </div>
+                    </dl>
+                </div>
+            </div>
 
-<!--Article listing-->
+            <div class="row">
+                <!-- Actions went here. -->
+            </div>
+
+        </div>
+    </div>
+
+    <div class="actions container-fluid">
+        <div class="col-md-4"><strong>Dataset</strong></div>
+        <div class="col-md-4">
+            <a href="{% url 'datafreezer_metadata_edit' dataset.id %}" class="btn btn-block" role="button"><i class="fa fa-pencil"></i>&nbsp;Edit</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ dataset.dataset_file.url }}" class="btn btn-primary btn-block" role="button"><i class="fa fa-arrow-down"></i>&nbsp;Download</a>
+        </div>
+        <div style="clear: both"></div>
+        <div class="spacer">&nbsp;</div>
+        <div class="col-md-4"><strong>Data dictionary</strong></div>
+        <div class="col-md-4">
+            <a href="{% url 'datafreezer_datadict_edit' dataset.id %}" class="btn btn-block" role="button"><i class="fa fa-pencil"></i>&nbsp;Edit</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'datafreezer_download_data_dictionary' dataset.id %}" class="btn btn-primary btn-block" role="button"><i class="fa fa-arrow-down"></i>&nbsp;Download</a>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="col-md-12">
+            <h4>Data Dictionary <small>What's in this dataset?</small></h4>
+        </div>
+        <table class="table table-hover">
+            <tbody>
+                <th>Column Index</th>
+                <th>Heading</th>
+                <th>Description</th>
+                <th>Data Type</th>
+            {% for field in datadict %}
+                <tr>
+                    <td>{{ field.columnIndex }}</td>
+                    <td>{{ field.heading }}</td>
+                    <td>{{ field.description }}</td>
+                    <td>{{ field.dataType }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
 {% if articles %}
-<div class="container-fluid">
-  <div class="col-sm-12">
-    <h4>Articles <small>Where has this data been sourced?</small></h4>
-  </div>
-    <table class="table table-hover">
-      <tbody>
-        <th>Title</th>
-        <th>Hyperlink</th>
-        {% for article in articles %}
-          <tr>
-            <td>{{ article.title }}</td>
-            <td>
-                <a href="{{ article.url }}" class="btn btn-primary btn-block" role="button">
-                  <span class="glyphicon glyphicon-globe" aria-hidden="true"></span>
-                </a>
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+    <div class="container-fluid">
+        <div class="col-sm-12">
+        <h4>Articles <small>Where has this data been sourced?</small></h4>
+        </div>
+        <table class="table table-hover">
+            <tbody>
+                <th>Title</th>
+                <th>Hyperlink</th>
+            {% for article in articles %}
+                <tr>
+                    <td>{{ article.title }}</td>
+                    <td>
+                        <a href="{{ article.url }}" class="btn btn-primary btn-block" role="button"><span class="glyphicon glyphicon-globe" aria-hidden="true"></span></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endif %}
-<!--End article listing-->
+
+</div>
 {% endblock content %}
