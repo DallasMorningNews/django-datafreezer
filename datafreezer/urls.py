@@ -129,6 +129,11 @@ urlpatterns = [
         name='datafreezer_download_data_dictionary'
     ),
 
+    # Generate create table statement
+    url(r'^create_table_sql/$',
+        GenerateCreateTable.as_view(),
+        name='datafreezer_create_table_sql'),
+
     # JSON endpoints
     url(
         r'^taglookup/$',

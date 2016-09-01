@@ -22,7 +22,6 @@
 {% endblock %}
 
 {% block content %}
-
 <div class="dataset-description">
     <div class="jumbotron">
         <div class="container">
@@ -89,6 +88,36 @@
         <div class="col-md-12">
             <h4>Data Dictionary <small>What's in this dataset?</small></h4>
         </div>
+
+        <div style="float:right;" class="col-md-2">
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Create Table SQL<span class="caret"></span></button>
+                <ul class="dropdown-menu ul-drp" role="menu">
+                    <li class="li-drp"><a href="#" id="postgres" data-toggle="modal" data-target="#myModal">PostgreSQL</a></li>
+                    <li class="li-drp"><a href="#" id="mysql" data-toggle="modal" data-target="#myModal">MySQL</a></li>
+                    <li class="li-drp"><a href="#" id="sqlite" data-toggle="modal" data-target="#myModal">SQLite</a></li>
+                </ul>
+            </div>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="myModalLabel">SQL Create Table Statement</h4>
+                        </div>
+                        <div class="modal-body">
+                            <pre id="sql-create-table"></pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <table class="table table-hover">
             <tbody>
                 <th>Column Index</th>
@@ -131,3 +160,59 @@
 
 </div>
 {% endblock content %}
+
+{% block scripts %}
+<script>
+$('.dropdown-menu li').click(function (event) {
+    var children=$(this).children("input[type=text]");
+    if(children.length!=0)
+    {
+        event.stopPropagation();
+    }
+   });
+
+// $(document).ready(function(){
+//   alert(1234)
+// });
+
+$('#postgres').on('click', function() {
+  $.ajax('{% url 'datafreezer_create_table_sql' %}', {
+    type: 'GET',
+    data:
+      {
+        data_dict_id: '{{ datadict_id }}',
+        sql_dialect: 'postgresql'
+      }
+  }).done(function (data) {
+    $('#sql-create-table').html(data);
+  });
+})
+
+$('#mysql').on('click', function() {
+  $.ajax('{% url 'datafreezer_create_table_sql' %}', {
+    type: 'GET',
+    data:
+      {
+        data_dict_id: '{{ datadict_id }}',
+        sql_dialect: 'mysql'
+      }
+  }).done(function (data) {
+    $('#sql-create-table').html(data);
+  });
+})
+
+$('#sqlite').on('click', function() {
+  $.ajax('{% url 'datafreezer_create_table_sql' %}', {
+    type: 'GET',
+    data:
+      {
+        data_dict_id: '{{ datadict_id }}',
+        sql_dialect: 'sqlite'
+      }
+  }).done(function (data) {
+    $('#sql-create-table').html(data);
+  });
+})
+
+</script>
+{% endblock scripts %}

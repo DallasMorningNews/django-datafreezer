@@ -26,6 +26,17 @@ from datafreezer.validators import (
 
 
 class DataDictionaryUploadForm(ModelForm):
+    """Treated as extras/overall information for Data Dictionary.
+
+    User can eventually upload a data dictionary of their own through
+    here and it will supplant DataDictionaryFields.
+
+    The meat of the DataDictionary will be colleted
+    via DataDictionaryFieldUploadForms.
+
+    Note: .form-control is for Bootstrap-styled forms.
+
+    """
     notes = forms.CharField(
         required=False,
         help_text='Is there anything else we should know about this dataset?',
@@ -53,6 +64,15 @@ class DataDictionaryUploadForm(ModelForm):
 
 
 class DataDictionaryFieldUploadForm(ModelForm):
+    """One instance represents one column in the original dataset.
+
+    Multiple DataDictionaryFieldUploadForms are generated via
+    inline formsets.
+
+    Users can add and delete forms from the formset to describe whatever
+    columns they'd like.
+
+    """
     columnIndex = forms.ChoiceField(
         widget=forms.Select(
             attrs={'class': 'form-control'}
@@ -101,7 +121,15 @@ class DataDictionaryFieldUploadForm(ModelForm):
 
 
 class DatasetUploadForm(ModelForm):
+    """Collects metadata for Dataset.
+
+    Years for date_begin and date_end are set on an automatic
+    100-year interval.
+
+    """
+
     def clean(self):
+        """Verifies that beginning date is before ending date."""
         cleaned_data = super(DatasetUploadForm, self).clean()
         date_begin = self.cleaned_data.get('date_begin')
         date_end = self.cleaned_data.get('date_end')
@@ -115,8 +143,8 @@ class DatasetUploadForm(ModelForm):
 
     HUBS_CHOICES = ((hub['slug'], hub['name']) for hub in HUBS_LIST)
 
-    START_YR = 1900
     END_YR = datetime.now().year
+    START_YR = END_YR - 100
     YEARS = [yr for yr in range(START_YR, END_YR+1)]
 
     def get_vertical_from_hub(self, hub_slug):
