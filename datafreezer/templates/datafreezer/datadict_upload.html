@@ -1,209 +1,286 @@
 {% extends 'datafreezer/base.html' %}
-  {% block title %}{{ title }}{% endblock title %}
 
-  {% block content %}
-  <p class="lead text-muted">Lead help text.Lead help text.Lead help text.Lead help text.</p>
-  <form class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
-    {% csrf_token %}
+{% block title %}{{ title }}{% endblock title %}
 
-    {{ fieldsFormset.media }}
+{% block content %}
+<div class="container-fluid">
+    <div class="panel panel-default">
+        <div class="panel-heading">Click a thing click a thing click a thing.</div>
+        <div class="panel-body dictBody">
+            <div class="row-fluid">
 
-    {{ fieldsFormset.management_form }}
-
-    {% if hasHeaders %}
-
-      {% for fieldForm in fieldsFormset %}
-        <fieldset>
-        {{ fieldForm.non_field_errors }}
-        {% for field in fieldForm %}
-          <div class="form-group {%if field.errors %}has-errors{%endif%}">
-            {% if field.errors %}
-              <div class="control-group alert alert-dismissible alert-danger">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
-                <ul class="errorlist">
-                  {% for error in field.errors %}
-                    <li><strong>{{ error|escape }}</strong></li>
-                  {% endfor %}
-                </ul>
-              </div>
-            {% endif %}
-            <label class="col-sm-2 control-label" for="{{ field.name }}">
-              {{ field.label }}
-            </label>
-            <div class="col-sm-10">
-              {{ field }}
-              {% if field.help_text %}
-                <span class="help-block">{{ field.help_text|safe }}</span>
-              {% endif %}
-            </div>
-          </div>
-        {% endfor %}
-        </fieldset>
-      {% endfor %}
-      <fieldset>
-        {% for field in dataDictExtrasForm %}
-          <div class="form-group {%if field.errors %}has-errors{%endif%}">
-            {% if field.errors %}
-              <div class="control-group alert alert-dismissible alert-danger">
-                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                  <ul class="errorlist">
-                    {% for error in field.errors %}
-                      <li><strong>{{ error|escape }}</strong></li>
-                    {% endfor %}
-                  </ul>
-              </div>
-            {% endif %}
-            <label class="col-sm-2 control-label" for="{{ field.name }}">
-              {{ field.label }}
-            </label>
-            <div class="col-sm-10">
-              {{ field }}
-              {% if field.help_text %}
-                <span class="help-block">{{ field.help_text|safe }}</span>
-              {% endif %}
-            </div>
-        {% endfor %}
-      </fieldset>
-    <div class="form-group">
-      <div class="col-sm-6 col-sm-offset-2">
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </div>
-    </div>
-    </form>
-
-{# Dynamic formset for files without header information #}
-
-  {% else %}
-
-    {% load formset_tags %}
-
-    <div id="formset" data-formset-prefix="{{ fieldsFormset.prefix }}">
-
-      <div data-formset-body>
-        {# New forms inserted here #}
-        {% for fieldForm in fieldsFormset %}
-          <div data-formset-form>
-            {% for field in fieldForm %}
-              <div class="form-group {%if field.errors %}has-errors{%endif%}">
-                {% if field.errors %}
-                  <div class="control-group alert alert-dismissible alert-danger">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <ul class="errorlist">
-                      {% for error in field.errors %}
-                        <li><strong>{{ error|escape }}</strong></li>
-                      {% endfor %}
-                    </ul>
-                  </div>
-                {% endif %}
-                <label class="col-sm-2 control-label" for="{{ field.name }}">
-                  {{ field.label }}
-                </label>
-                <div class="col-sm-10">
-                  {{ field }}
-                  {% if field.help_text %}
-                    <span class="help-block">{{ field.help_text|safe }}</span>
-                  {% endif %}
+                <div class="col-sm-3 drawerContainer">
+                    <div class="list-group drawerInside">
+                        {% if hasHeaders %}
+                        {% for fieldForm in fieldsFormset %}
+                        <button type="button" id="drawer-{{ fieldForm.heading.auto_id|cut:"-heading" }}" class="list-group-item">
+                            <h6 class="list-group-item-heading">{{ fieldForm.heading.form.initial.heading }}</h6>
+                            <p class="list-group-item-text">
+                                {% if fieldForm.description.form.initial.description %} {{ fieldForm.description.form.initial.description|truncatechars:50 }} {% else %} Description text... {% endif %}
+                            </p>
+                        </button>
+                        {% endfor %}
+                        {% else %}
+                        <button type="button" id="drawer-id_fields-0" class="list-group-item active">
+                            <h6 class="list-group-item-heading">Column 1</h6>
+                            <p class="list-group-item-text">Description text...</p>
+                        </button>
+                        {% endif %}
+                        <!--<button type="button" id="empty-drawer-message" class="list-group-item disabled">
+                            <h6 class="list-group-item-heading">No columns added</h6>
+                            <p class="list-group-item-text">Click "Add" to describe a column of your dataset.</p>
+                        </button>-->
+                    </div>
+                    <div class="row drawerButtons">
+                        <div class="add-button"></div>
+                        <div class="delete-button"></div>
+                        {% comment %}
+                        <!-- <button type="button" class="col-sm-offset-1 col-sm-4 btn btn-primary" id="data-formset-add">Add</a>
+                        <button type="button" class="col-sm-offset-2 col-sm-4 btn btn-danger" id="data-formset-delete" >Delete</a> -->
+                        {% endcomment %}
+                    </div>
                 </div>
-              </div>
-            {% endfor %}
-            <div class="form-group">
-              <div class="col-sm-6 col-sm-offset-2">
-                <button type="button" class="btn btn-danger" data-formset-delete-button>Delete field</button>
-              </div>
+
+                <div id="formset" data-formset-prefix="{{ fieldsFormset.prefix }}" class="col-sm-offset-1 col-sm-8 fieldsetCol" data-formset-body>
+                    <form style="position:relative;" class="form-horizontal" role="form" method="post" data-toggle="validator" enctype="multipart/form-data">
+                        {% csrf_token %} {{ fieldsFormset.media }} {{ fieldsFormset.management_form }}
+
+                        <div class="column-ui">
+
+                            {% for fieldForm in fieldsFormset %}
+                            <fieldset data-formset-form class="dictFieldset" id="fieldset-{{ fieldForm.heading.auto_id|cut:"-heading" }}">
+                                {{ fieldForm.non_field_errors }} {% for field in fieldForm %}
+                                <div class="form-group {%if field.errors %}has-errors{%endif%}">
+                                    {% if field.errors %}
+                                    <div class="control-group alert alert-dismissible alert-danger">
+                                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                        <ul class="errorlist">
+                                            {% for error in field.errors %}
+                                            <li><strong>{{ error|escape }}</strong></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                    <label class="col-md-2 col-sm-3 control-label" for="{{ field.name }}">
+                                        {{ field.label }}
+                                    </label>
+                                    <div class="col-md-10 col-sm-9">
+                                        {{ field }} {% if field.help_text %}
+                                        <span class="help-block">{{ field.help_text|safe }}</span> {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </fieldset>
+                            {% endfor %}
+                        </div>
+                </div>
+                <div style="clear:both;"></div>
             </div>
-          </div>
-        {% endfor %}
-      </div>
 
-      <!-- Empty form template. By wrapping in a script tag, the __prefix__
-      placeholder can easily be replaced in both attributes and any scripts. -->
-
-      <script type="form-template" data-formset-empty-form>
-        {% escapescript %}
-          <div data-formset-form>
-            {% for field in fieldsFormset.empty_form %}
-              <label class="col-sm-2 control-label" for="{{ field.name }}">
-                {{ field.label }}
-              </label>
-              <div class="col-sm-10">
-                {{ field }}
-                {% if field.help_text %}
-                  <span class="help-block">{{ field.help_text|safe }}</span>
-                {% endif %}
-              </div>
-            {% endfor %}
-            <div class="form-group">
-              <div class="col-sm-6 col-sm-offset-2">
-                <br>
-                <button type="button" class="btn btn-danger" data-formset-delete-button>Delete field</button>
-              </div>
+            <div class='row-fluid'>
+                <div class="col-sm-12 rule">
+                    <br>
+                </div>
+                <div style="clear:both;"></div>
             </div>
-          </div>
-        {% endescapescript %}
-      </script>
 
-      <fieldset>
-        {% for field in dataDictExtrasForm %}
-          <div class="form-group {%if field.errors %}has-errors{%endif%}">
-            {% if field.errors %}
-              <div class="control-group alert alert-dismissible alert-danger">
-                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                  <ul class="errorlist">
-                    {% for error in field.errors %}
-                      <li><strong>{{ error|escape }}</strong></li>
-                    {% endfor %}
-                  </ul>
-              </div>
-            {% endif %}
-            <label class="col-sm-2 control-label" for="{{ field.name }}">
-              {{ field.label }}
-            </label>
-            <div class="col-sm-10">
-              {{ field }}
-              {% if field.help_text %}
-                <span class="help-block">{{ field.help_text|safe }}</span>
-              {% endif %}
+
+            <div class="row-fluid dictExtras">
+                    <fieldset>
+                        {% for field in dataDictExtrasForm %}
+                        <div class="form-group {%if field.errors %}has-errors{%endif%}">
+                            {% if field.errors %}
+                            <div class="control-group alert alert-dismissible alert-danger">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                <ul class="errorlist">
+                                    {% for error in field.errors %}
+                                    <li><strong>{{ error|escape }}</strong></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            <label class="col-sm-2 control-label" for="{{ field.name }}">
+                                {{ field.label }}
+                            </label>
+                            <div class="col-sm-10">
+                                {{ field }} {% if field.help_text %}
+                                <span class="help-block">{{ field.help_text|safe }}</span> {% endif %}
+                            </div>
+                            {% endfor %}
+                    </fieldset>
+                    </div>
+
+                    <div class="row-fluid">
+                        <div class="form-group">
+                            <div class="col-md-offset-10 col-md-2 col-sm-offset-6 col-sm-2">
+                                <button type="submit" class="btn btn-lg btn-primary">Submit</button>
+                                <br><br>
+                            </div>
+                        </div>
+                        <div style="clear:both;"></div>
+                    </div>
+
+                    </form>
+                <div style="clear:both;"></div>
             </div>
-        {% endfor %}
-      </fieldset>
 
-      {# This button will add a new form when clicked. #}
-      <div class="form-group">
-        <div class="col-sm-6">
-          <div class="col-sm-2 col-sm-offset-2">
-            <input type="button" class="btn btn-default" value="Add another" data-formset-add>
-          </div>
-
-          <div class="col-sm-6 col-sm-offset-2">
-            <button type="submit" class="btn btn-primary">Submit</button>
-          </div>
         </div>
-      </div>
-
-      <script>
-        jQuery(function($) {
-          $('#formset').formset({
-            animateForms: true
-          });
-
-        });
-
-        $('#formset').on('formAdded', function(event) {
-          // $("label[for='DELETE']").css("display", "none");
-          // $("input[id*='DELETE']").css("display", "none");
-          $("label[for='DELETE']").css("margin-left", "-500000px")
-            .css("position", "absolute");
-          $("input[id*='DELETE']").css("margin-left", "-500000px")
-            .css("position", "absolute");
-        });
-
-
-      </script>
-
     </div>
+</div>
+
+
+<script>
+
+    var formIDCounter = 0;
+
+    function getNextListItem(idNumber){
+        return "<button type='button' id='drawer-id_fields-" + idNumber + "' class='list-group-item'><h6 class='list-group-item-heading'>Column " + (idNumber+1) + "</h6><p class='list-group-item-text'>Description text...</p></button>"
+    }
+
+    function getNextID(){
+        formIDCounter++;
+        return formIDCounter;
+    }
+
+    function getLastCreatedID(){
+        return formIDCounter;
+    }
+
+    function rollBackID(){
+        if(formIDCounter > 0){
+            formIDCounter--;
+        }
+        else{
+            formIDCounter = 0;
+        }
+        return formIDCounter;
+    }
+
+    function bringFieldsIntoFocus(fieldID){
+        if (!$(fieldID).hasClass('active')) {
+            $('.list-group-item').removeClass('active');
+            $(fieldID).addClass('active');
+            $('.column-ui > fieldset').fadeOut();
+
+            var drawer_id = $(fieldID).attr('id');
+            var fieldset_id = '#fieldset' + drawer_id.substring(6, drawer_id.length);
+            $(fieldset_id).fadeIn(600);
+        }
+    }
+
+    $(document).ready(function(event) {
+        $('.column-ui > fieldset').hide();
+        $('#fieldset-id_fields-0').show();
+        $('#id_fields-0-DELETE').attr('checked', false);
+        $('#drawer-id_fields-0').addClass('active');
+        // $('#drawer-id_fields-0').unbind('click');
+
+        // Set that last pesky form to initial mark for deletion
+        var lastFieldsetIDNum = $('.column-ui > fieldset').last().attr("id").split("-").pop();
+        var lastDeleteBoxID = '#id_fields-' + lastFieldsetIDNum + '-DELETE';
+
+        $(lastDeleteBoxID).attr('checked', true);
+
+
+        $("label[for='DELETE']").css("margin-left", "-500000px")
+            .css("position", "absolute");
+        $("input[id*='DELETE']").css("margin-left", "-500000px")
+            .css("position", "absolute");
+
+
+            // {% for fieldForm in fieldsFormset %}
+            //     formIDCounter++;
+            // {% endfor %}
+
+    });
+
+    $(document).on('click', '.list-group-item', function(event) {
+        // $('.list-group-item').bind('click');
+        // $(this).unbind('click');
+        if (!$(this).hasClass('active')) {
+            $('.list-group-item').removeClass('active');
+            $(this).addClass('active');
+            $('.column-ui > fieldset').fadeOut();
+
+            var drawer_id = $(this).attr('id');
+            var fieldset_id = '#fieldset' + drawer_id.substring(6, drawer_id.length);
+            $(fieldset_id).fadeIn(600);
+        }
+    });
+
+
+    $('[id$=description]').on('input', function() {
+        var field_id = $(this).attr('id');
+        var drawer_id = '#drawer-' + field_id.substring(0, field_id.length-12);
+        if ($(this).val().length > 25){
+            $(drawer_id + '> p').text($(this).val().substring(0, 22) + '...');
+        }
+        else if($(this).val().length == 0){
+            $(drawer_id + '> p').text('Description text...');
+        }
+        else{
+            $(drawer_id + '> p').text($(this).val());
+        }
+
+    });
+    //
+    $('[id$=heading]').on('input', function() {
+        var field_id = $(this).attr('id');
+        var drawer_id = '#drawer-' + field_id.substring(0, field_id.length-8);
+
+        if ($(this).val().length > 20){
+            $(drawer_id + '> h6').text($(this).val().substring(0, 17) + '...');
+        }
+        else if($(this).val().length == 0){
+            column_id = "#" + field_id.substring(0, field_id.length-8) + '-columnIndex'
+            $(drawer_id + '> h6').text('Column ' + $(column_id).val());
+        }
+        else{
+            $(drawer_id + '> h6').text($(this).val());
+        }
+
+    });
+
+    $('#data-formset-add').on('click', function() {
+        var next_id = getNextID();
+        var new_drawer_id = '#drawer-id_fields-' + next_id
+        $('.drawerInside').append(getNextListItem(next_id));
+
+        $('#id_fields-' + next_id + '-DELETE').attr('checked', false);
+
+        $('.active').removeClass('active');
+
+        $(new_drawer_id).trigger('click');
+        $(new_drawer_id).addClass('active');
+    });
+
+    $('#data-formset-delete').on('click', function() {
+
+        var drawerToRemoveID = '#' + $('.active').attr("id");
+        var fieldToRemoveID = '#fieldset' + drawerToRemoveID.substring(7, drawerToRemoveID.length);
+        // alert(fieldToRemoveID);
+        $(drawerToRemoveID).remove();
+        $(fieldToRemoveID).hide();
+        var deleteField = '#id_fields-' + fieldToRemoveID.substring(fieldToRemoveID.length-1, fieldToRemoveID.length) + '-DELETE';
+        $(deleteField).attr('checked', true);
+
+        rollBackID();
+
+        var deletedID = drawerToRemoveID.substring(drawerToRemoveID.length-1, drawerToRemoveID.length);
+        // alert(deletedID);
+
+        var selectThisAfterDeletion = '#drawer-id_fields-' + (deletedID - 1)
+        // alert(selectThisAfterDeletion)
+        $(selectThisAfterDeletion).trigger('click');
+        $(selectThisAfterDeletion).addClass('active');
 
 
 
-  {% endif %}
+
+    });
+
+
+
+</script>
 
 {% endblock %}

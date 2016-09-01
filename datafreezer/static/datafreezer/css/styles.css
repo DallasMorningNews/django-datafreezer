@@ -1,3 +1,404 @@
+/*                */
+/* I. Page styles */
+/*                */
+
+html,
+body {
+    height: 100%;
+    font-size: 16px;
+    width: 100%;
+}
+
+
+
+/*                */
+/* II. Navigation */
+/*                */
+
+.navbar {
+    background-color: #3C3C3C;
+    box-shadow: none;
+    color: #FFFFFF;
+    padding: 0;
+}
+
+.navbar > .navbar-inner {
+    background-image: -ms-linear-gradient(top left, #27B2B2 0%, #379999 70%);
+    background-image: -moz-linear-gradient(top left, #27B2B2 0%, #379999 70%);
+    background-image: -o-linear-gradient(top left, #27B2B2 0%, #379999 70%);
+    background-image: -webkit-gradient(linear, left top, right bottom, color-stop(0, #27B2B2), color-stop(70, #379999));
+    background-image: -webkit-linear-gradient(top left, #27B2B2 0%, #379999 70%);
+    background-image: linear-gradient(to bottom right, #27B2B2 0%, #379999 70%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FF27B2B2', endColorstr='#FF379999', GradientType=1);
+    height: 5rem;
+    margin: 0 auto;
+    padding: 0.3rem 0.75rem;
+    position: relative;
+}
+
+.navbar > .navbar-inner::after {
+    clear: both;
+}
+
+.navbar > .navbar-inner > .top-bar-left {
+    float: left;
+}
+
+.navbar > .navbar-inner > .top-bar-right {
+    float: right;
+}
+
+.navbar > .navbar-inner > #logo-holder .masthead {
+    box-sizing: border-box;
+    display: block;
+    height: 1rem;
+    margin: 0.3rem 0 0 1.5rem;
+    opacity: 0.7;
+    padding: 0;
+}
+
+.navbar > .navbar-inner > #logo-holder .datafreezer-wordmark {
+    box-sizing: border-box;
+    display: block;
+    height: 1.7rem;
+    margin: 0.65rem 0 0.8rem 1.5rem;
+    padding: 0;
+}
+
+.navbar > .navbar-inner > #links-user-info-holder {
+    font-weight: 500;
+    height: 4.4rem;
+    line-height: 1.9rem;
+    padding: 2rem 1rem 0 0.5rem;
+}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse {}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav {}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li {
+    color: #E0E0E0;
+    font-size: 1rem;
+    font-weight: 400;
+    height: 1.9rem;
+    line-height: 1.9rem;
+}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.divider {
+    color: #FFFFFF;
+}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user {
+    color: #FFFFFF;
+}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li > a {
+    color: inherit;
+    line-height: inherit;
+    padding: 0;
+    text-decoration: none;
+}
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > a {
+    border-radius: 5px;
+    display: inline-block;
+    padding: 0px 6px;
+    margin: 0 -6px;
+}
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > a:hover {
+    background-color: #328C8C;
+}
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.open > a,
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.open > a:hover {
+    background-color: #2E7F7F;
+}
+
+@media (max-width: 767px) {
+    .navbar > .navbar-inner > #links-user-info-holder {
+        height: 4rem;
+        line-height: 4rem;
+        padding: 0;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-toggle {
+        border-color: rgba(255,255,255,0.85);
+        height: 3rem;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        right: 1.5rem;
+        top: 1rem;
+        width: 3rem;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-toggle:hover {
+        border-color: rgba(255,255,255,1);
+        background-color: rgba(0,0,0,0.15);
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-toggle[aria-expanded="true"] {
+        background-color: #2E7F7F;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-toggle .icon-bar {
+        background-color: rgba(255,255,255,0.85);
+        height: 3px;
+        margin: 0 calc(0.75rem - 1px);
+        width: 1.5rem;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-toggle:hover .icon-bar {
+        background-color: rgba(255,255,255,1);
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-toggle .icon-bar + .icon-bar {
+        margin-top: 4px;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse {
+        background: #379999;
+        border: 1px solid #455A64;
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        padding: 0;
+        position: absolute;
+        right: 1.5rem;
+        top: 4.125rem;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav {
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li {
+        height: 2.4rem;
+        line-height: 2.4rem;
+        padding: 0 0.75rem;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li:hover {
+        background-color: #2E7F7F;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.divider {
+        display: none;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user,
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user:hover {
+        background-color: #455A64;
+        border-bottom-left-radius: 2px;
+        border-bottom-right-radius: 2px;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown {
+        height: auto;
+        line-height: inherit;
+        padding: 0;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown:hover {
+        background-color: transparent;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li > a {}
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > a {
+        display: none;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu {
+        background: transparent;
+        border-radius: 0px;
+        box-shadow: none;
+        color: inherit;
+        display: block;
+        float: none;
+        padding: 0;
+        position: relative;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu > li {
+        display: block;
+        font-size: 1rem;
+        height: 2.4rem;
+        line-height: 2.4rem;
+        padding: 0 0.75rem;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu > li:hover {
+        background-color: #2E7F7F;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu > li > a {
+        color: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        padding: 0;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu > li > a:hover {
+        background: none;
+    }
+}
+
+
+
+/**/
+/* III. Main container. */
+/**/
+
+#main {
+    background-color: transparent;
+    margin: 7.5rem auto 5rem;
+    max-width: 57rem;
+    padding: 0 1rem;
+}
+
+
+@media (max-width: 768px) {
+    #main {
+        margin-top: 7.5rem auto 5rem;
+    }
+}
+
+.content-inner {
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+
+
+/*            */
+/* IV. Forms. */
+/*            */
+
+.form-horizontal {
+    background-color: #FFFFFF;
+    padding: 1.25rem 0.5rem;
+}
+
+.field-group {
+    margin-bottom: 15px;
+}
+
+.field-group > .control-label {
+    margin-bottom: 0;
+    padding-top: 7px;
+}
+
+.help-block {
+    color: #9E9E9E;
+    display: block;
+    font-size: 0.8rem;
+    margin: 0.125rem 0 0 0.125rem;
+}
+
+
+
+/*                            */
+/* V. Persistent save button. */
+/*                            */
+
+.edit-bar {
+    background: #FFFFFF;
+    border-top: 1px solid #E5E5E5;
+    bottom: 0;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.16),0 3px 6px rgba(0,0,0,0.23);
+    box-sizing: content-box;
+    height: 3rem;
+    left: 0;
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+}
+
+.edit-bar > .button-holder {
+    margin: 0 auto;
+    max-width: 57rem;
+    padding: 0 1rem;
+}
+
+.edit-bar > .button-holder > .save-button {
+    box-shadow: none;
+    color: #080808;
+    float: right;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.125rem;
+    margin: 0.4375rem 0.5rem 0.4375rem 0;
+    min-width: 5.5rem;
+    outline: none;
+    padding: 0.5rem;
+}
+.edit-bar > .button-holder > .save-button:hover,
+.edit-bar > .button-holder > .save-button:active:hover {
+    background-color: #E4E4E4 !important;
+}
+.edit-bar > .button-holder > .save-button:active {
+    background-color: #C9C9C9;
+    background-image: -webkit-radial-gradient(circle, #C9C9C9 10%, #fff 11%);
+    background-image: -o-radial-gradient(circle, #C9C9C9 10%, #fff 11%);
+    background-image: radial-gradient(circle, #C9C9C9 10%, #fff 11%);
+    color: #000000;
+}
+
+.edit-bar > .button-holder > .save-continue-button {
+    color: #0185D3;
+}
+.edit-bar > .button-holder > .save-continue-button:hover,
+.edit-bar > .button-holder > .save-continue-button:active:hover {
+    background-color: #E1F1FA !important;
+}
+.edit-bar > .button-holder > .save-continue-button:active {
+    background-color: #ABD7F1;
+    background-image: -webkit-radial-gradient(circle, #ABD7F1 10%, #fff 11%);
+    background-image: -o-radial-gradient(circle, #ABD7F1 10%, #fff 11%);
+    background-image: radial-gradient(circle, #ABD7F1 10%, #fff 11%);
+    color: #01456D;
+}
+
+/**/
+/* VI. Form header. */
+/**/
+
+#main > .content-inner > #header {
+    background: #2B7878;
+    border-bottom: 1px solid #455A64;
+    border-top-left-radius: 2px;
+    border-top-right-radius: 2px;
+    margin: 0;
+    padding: 15px 0 16px 21px;
+}
+#main > .content-inner > #header > h2 {
+    color: #FFFFFF;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 40px;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+
+/*                                        */
+/* VII. Common non-form page architecture */
+/*                                        */
+
+.jumbotron {
+    background-color: #F5F5F5;
+    border: 3px double #D5D5D5;
+}
+
+
+
+/*                            */
+/* VIII. Miscellaneous (other) */
+/*                            */
+
 .errorlist{
   list-style: none;
 }
@@ -14,15 +415,6 @@
      right center;
 }
 
-#main{
-  margin-top: 100px;
-  margin-left: 80px;
-  margin-right: 80px;
-  margin-bottom: 50px;
-  box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
-  background-color: white;
-}
-
 #datafreezer-body{
   background-color: #EAEAEA;
 }
@@ -37,14 +429,81 @@
 }
 
 @media (max-width: 768px){
-  #main{
-    margin-top:35px;
-    margin-left: 0px;
-    margin-right: 0px;
-    margin-bottom: 0px;
-  }
+	.dictExtras{
+		padding-top:110px;
+		padding-left:0px;
+		margin-left:0px;
+	}
+
+	.rule{
+		display:none;
+	}
+
+	.fieldsetCol{
+		margin-top: 50px;
+	}
+
 }
 
 .center{
 	margin: auto;
+}
+
+.dictBody{
+	padding-top:0px;
+}
+
+.drawerContainer{
+	margin: 10px 0px 0px 0px;
+	padding:0px;
+	height:360px;
+	/*overflow-y:hidden;*/
+}
+
+.drawerInside{
+	height:100%;
+	width:100%;
+	/*padding-right:10px;
+	padding-top:10px;
+	padding-bottom:0px;*/
+	padding:0px;
+	overflow:scroll;
+	overflow-x:hidden;
+	margin-bottom:0px;
+}
+
+.drawerButtons{
+	/*background-color: black;*/
+	text-align:center;
+	padding: 10px 0px 0px 0px;
+	margin-right:0px;
+}
+
+.rule{
+	background-color:whitesmoke;
+	width:100%;
+	height:5px;
+	margin-top:20px;
+}
+
+.dictFieldset{
+	position:absolute;
+	top:0;
+}
+
+.fieldsetCol{
+	padding-top:15px;
+	padding-bottom:0px;
+}
+
+.column-ui > fieldset{
+	display:none;
+}
+
+.column-ui{
+	height:400px;
+}
+
+#empty-drawer-message{
+	display:none;
 }

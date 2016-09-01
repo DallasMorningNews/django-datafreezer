@@ -1,1 +1,2 @@
-from django.test import TestCase
+# Imports from django.  # NOQA
+from django.test import TestCase  # NOQA

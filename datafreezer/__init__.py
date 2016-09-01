@@ -1,1 +1,1 @@
-default_app_config = 'datafreezer.apps.DatafreezerConfig'
+default_app_config = 'datafreezer.apps.DatafreezerConfig'  # NOQA

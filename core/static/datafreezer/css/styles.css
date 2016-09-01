@@ -1,3 +1,8 @@
+html, body{
+    height:100%;
+    width:100%;
+}
+
 .errorlist{
   list-style: none;
 }
@@ -6,10 +11,119 @@
   display: none;
 }
 
-.loading 
+.loading
 {
    background:
      url('http://www.hsi.com.hk/HSI-Net/pages/images/en/share/ajax-loader.gif')
      no-repeat
      right center;
+}
+
+#main{
+  margin-top: 100px;
+  margin-left: 80px;
+  margin-right: 80px;
+  margin-bottom: 50px;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+  background-color: white;
+}
+
+#datafreezer-body{
+  background-color: #EAEAEA;
+}
+
+#loginText{
+  margin-right:10px;
+}
+
+.sidebar-nav{
+  list-style: none;
+  border
+}
+
+@media (max-width: 768px){
+  #main{
+    margin-top:35px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
+  }
+
+	.dictExtras{
+		padding-top:110px;
+		padding-left:0px;
+		margin-left:0px;
+	}
+
+	.rule{
+		display:none;
+	}
+
+	.fieldsetCol{
+		margin-top: 50px;
+	}
+
+}
+
+.center{
+	margin: auto;
+}
+
+.dictBody{
+	padding-top:0px;
+}
+
+.drawerContainer{
+	margin: 10px 0px 0px 0px;
+	padding:0px;
+	height:360px;
+	/*overflow-y:hidden;*/
+}
+
+.drawerInside{
+	height:100%;
+	width:100%;
+	/*padding-right:10px;
+	padding-top:10px;
+	padding-bottom:0px;*/
+	padding:0px;
+	overflow:scroll;
+	overflow-x:hidden;
+	margin-bottom:0px;
+}
+
+.drawerButtons{
+	/*background-color: black;*/
+	text-align:center;
+	padding: 10px 0px 0px 0px;
+	margin-right:0px;
+}
+
+.rule{
+	background-color:whitesmoke;
+	width:100%;
+	height:5px;
+	margin-top:20px;
+}
+
+.dictFieldset{
+	position:absolute;
+	top:0;
+}
+
+.fieldsetCol{
+	padding-top:15px;
+	padding-bottom:0px;
+}
+
+.column-ui > fieldset{
+	display:none;
+}
+
+.column-ui{
+	height:400px;
+}
+
+#empty-drawer-message{
+	display:none;
 }

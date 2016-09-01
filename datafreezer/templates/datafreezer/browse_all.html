@@ -4,6 +4,25 @@
 
 {% block title %}{{ page_title }}{% endblock title %}
 
+{% block custom_head %}
+    <style media="screen">
+        .table-responsive {
+            background: #FFFFFF;
+            padding: 1rem;
+        }
+
+        .pagination-holder {
+            background: #FFFFFF;
+            padding: 0 0.75rem;
+        }
+
+        .pagination-holder nav {
+            border-top: 4px double #E0E0E0;
+        }
+    </style>
+{% endblock %}
+
+
 {% block content %}
 
   <!-- Begin descriptor row -->
@@ -35,7 +54,7 @@
       </table>
     </div>
 
-	<div class="text-center">
+	<div class="pagination-holder text-center">
 		<nav aria-label="Page navigation">
 
 			<ul class="pagination pagination-sm">

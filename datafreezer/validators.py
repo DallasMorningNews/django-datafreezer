@@ -1,8 +1,11 @@
-from django import forms
+# Imports from python.  # NOQA
+import csv
+
+
+# Imports from django.
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-
-import csv
+from django import forms
 
 
 def validate_dataset_file(value):
@@ -23,11 +26,27 @@ def validate_dataset_file(value):
 
 
 class MultiURLField(forms.Field):
-    def to_python(self, value):
-        return value.split(',')
+    # def to_python(self, value):
+    #     # urls = value.all()
+    #     # print urls
+    #     return value
+    #     # return urls
+    def prepare_value(self, value):
+        if value:
+            urls = [item.url for item in value]
+            return ', '.join(urls) + ', '
+        return ''
 
     def validate(self, value):
         # Use parents' handling of required fields, etc.
         super(MultiURLField, self).validate(value)
         for url in value:
             URLValidator(url)
+
+
+class MultiTagField(forms.CharField):
+    def prepare_value(self, value):
+        if value:
+            tags = [item.word for item in value]
+            return ', '.join(tags) + ', '
+        return ''

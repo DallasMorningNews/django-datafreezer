@@ -4,45 +4,73 @@
 
 {% block title %}{{ page_title }}{% endblock title %}
 
+{% block custom_head %}
+    <style media="screen">
+        .dataset-browser {
+            background: #FFFFFF;
+            padding: 0.5rem 0 0;
+        }
+
+        a .listed-dataset {
+            height: 4.5rem;
+            margin: 0;
+            padding: 0.75rem 1rem;
+        }
+
+        a .listed-dataset.even {
+            background-color: #F5F5F5;
+        }
+
+        a:hover {
+            text-decoration: none;
+        }
+
+        a:hover .listed-dataset {
+            background-color: #B6DEDE;
+        }
+
+        .attribute-name {
+            color: #212121;
+            font-size: 1rem;
+            line-height: 1rem;
+            margin: 0;
+            padding: 0.25rem 0;
+        }
+
+        .upload-count {
+            color: #969696;
+            font-size: 1rem;
+            line-height: 1rem;
+            margin: 0;
+            padding: 0.25rem 0;
+        }
+    </style>
+{% endblock %}
+
 {% block content %}
-
-  <!-- Begin descriptor row -->
-  {% if sections %}
-    <div class="container-fluid">
-      {% for section in sections %}
+    {% if sections %}
+    <div class="dataset-browser">
+    {% for section in sections %}
         {% if browse_type == 'AUTHORS' %}
-          <a href="{% url 'datafreezer_author_detail' section.slug %}">
+        <a href="{% url 'datafreezer_author_detail' section.slug %}">
         {% elif browse_type == 'TAGS' %}
-          <a href="{% url 'datafreezer_tag_detail' section.slug %}">
-				{% elif browse_type == 'HUBS' %}
-					<a href="{% url 'datafreezer_hub_detail' section.slug %}">
-				{% elif browse_type == 'VERTICALS' %}
-					<a href="{% url 'datafreezer_vertical_detail' section.slug %}">
-				{% elif browse_type == 'SOURCES' %}
-					<a href="{% url 'datafreezer_source_detail' section.slug %}">
+        <a href="{% url 'datafreezer_tag_detail' section.slug %}">
+        {% elif browse_type == 'HUBS' %}
+        <a href="{% url 'datafreezer_hub_detail' section.slug %}">
+        {% elif browse_type == 'VERTICALS' %}
+        <a href="{% url 'datafreezer_vertical_detail' section.slug %}">
+        {% elif browse_type == 'SOURCES' %}
+        <a href="{% url 'datafreezer_source_detail' section.slug %}">
         {% endif %}
-          <div class="panel panel-default">
-            <div class="panel-body">
-              <div class="row-fluid">
-                <div class="col-md-8 col-sm-6">
-                  <h4>{{ section.name }}</h4>
-                </div>
-                <div class="col-md-offset-2 col-md-2 col-sm-offset-2 col-sm-4">
-                  <h4><small>Uploads:</small> {{ section.count }}</h4>
-                </div>
-              </div>
+
+            <div class="listed-dataset {% cycle 'odd' 'even' %}">
+                <div class="attribute-name">{{ section.name }}</div>
+                <div class="upload-count">{{ section.count }} upload{{ section.count|pluralize }}</div>
             </div>
-          </div>
         </a>
-      {% endfor %}
+    {% endfor %}
     </div>
-  {% else %}
-    {% block no_results_msg %}
-      {{ block.super }}
-    {% endblock no_results_msg %}
-  {% endif %}
-  <!-- End descriptor row -->
-
-
-<!--End article listing-->
+    {% else %}
+        {% block no_results_msg %}{{ block.super }}{% endblock no_results_msg %}
+    {% endif %}
 {% endblock content %}
