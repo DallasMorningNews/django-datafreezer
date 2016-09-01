@@ -1,0 +1,8 @@
+include readme.md
+include LICENSE
+include requirements.txt
+include requirements.in
+include manage.py
+recursive-include datafreezer/static *
+recursive-include datafreezer/uploads *
+recursive-include datafreezer/templates *
