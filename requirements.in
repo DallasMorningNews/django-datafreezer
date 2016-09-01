@@ -7,6 +7,6 @@ oauthlib
 psycopg2
 requests
 wsgiref
-django-formset-js
 beautifulsoup4~=4.5.1
 MySQL-python # for DDL
+django-dynamic-formsets

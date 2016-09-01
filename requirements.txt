@@ -7,8 +7,7 @@
 beautifulsoup4==4.5.1
 boto==2.42.0
 dj-database-url==0.4.1
-django-formset-js==0.5.0
-django-jquery-js==2.1.4   # via django-formset-js
+django-dynamic-formsets==0.0.8
 django-storages==1.5.0
 Django==1.10              # via django-formset-js, django-jquery-js
 gunicorn==19.6.0
@@ -16,6 +15,4 @@ MySQL-python==1.2.5
 oauthlib==1.1.2
 psycopg2==2.6.2
 requests==2.11.0
-six==1.10.0               # python-dateutil
-sqlalchemy==1.0.14
 wsgiref==0.1.2

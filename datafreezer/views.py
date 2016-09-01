@@ -56,10 +56,11 @@ from datafreezer.forms import (
     # DataDictionaryUploadForm,
     DatasetUploadForm,
 )
-from datafreezer.helpers import (
-    get_connection_string,  # NOQA
-    get_db_type_from_text,
-)
+# Create Table SQL TK
+# from datafreezer.helpers import (
+#     get_connection_string,  # NOQA
+#     get_db_type_from_text,
+# )
 from datafreezer.models import (
     Article,  # NOQA
     DataDictionary,
@@ -379,7 +380,7 @@ def download_data_dictionary(request, dataset_id):
 # Home page for the application
 def home(request):
     """Renders Datafreezer homepage. Includes recent uploads."""
-    recent_uploads = Dataset.objects.order_by('-date_uploaded')[:9]
+    recent_uploads = Dataset.objects.order_by('-date_uploaded')[:11]
 
     email_list = [upload.uploaded_by.strip() for upload in recent_uploads]
     # print all_staff
@@ -554,44 +555,44 @@ def dataset_detail(request, dataset_id):
         }
     )
 
-
-class GenerateCreateTable(View):
-    """Generates/returns CREATE TABLE statements in various SQL flavors.
-
-    Generates statement based on data dictionary field information
-    entered into DB.
-
-    """
-    def get(self, request):
-        data_dict_id = request.GET['data_dict_id']
-        sql_dialect = request.GET['sql_dialect']
-        dataDictionary = get_object_or_404(DataDictionary, pk=data_dict_id)
-        fields = DataDictionaryField.objects.filter(
-            parent_dict=dataDictionary.id
-        ).order_by('columnIndex')
-
-        cols = [
-            {
-                'name': field.heading,
-                'type': get_db_type_from_text(field.dataType)
-            }
-            for field in fields
-        ]
-
-        e = create_engine(get_connection_string(sql_dialect))
-
-        newTable = Table(dataDictionary.dataset.title,
-            MetaData(bind=e),
-            *(Column(col['name'], col['type'])
-                for col in cols
-            )  # noqa
-        )
-
-        createTableStatement = CreateTable(newTable)
-
-        # print(createTableStatement)
-
-        return HttpResponse(createTableStatement)
+# Generate Create Table SQL Feature TK
+# class GenerateCreateTable(View):
+#     """Generates/returns CREATE TABLE statements in various SQL flavors.
+#
+#     Generates statement based on data dictionary field information
+#     entered into DB.
+#
+#     """
+#     def get(self, request):
+#         data_dict_id = request.GET['data_dict_id']
+#         sql_dialect = request.GET['sql_dialect']
+#         dataDictionary = get_object_or_404(DataDictionary, pk=data_dict_id)
+#         fields = DataDictionaryField.objects.filter(
+#             parent_dict=dataDictionary.id
+#         ).order_by('columnIndex')
+#
+#         cols = [
+#             {
+#                 'name': field.heading,
+#                 'type': get_db_type_from_text(field.dataType)
+#             }
+#             for field in fields
+#         ]
+#
+#         e = create_engine(get_connection_string(sql_dialect))
+#
+#         newTable = Table(dataDictionary.dataset.title,
+#             MetaData(bind=e),
+#             *(Column(col['name'], col['type'])
+#                 for col in cols
+#             )  # noqa
+#         )
+#
+#         createTableStatement = CreateTable(newTable)
+#
+#         # print(createTableStatement)
+#
+#         return HttpResponse(createTableStatement)
 
 
 class PaginatedBrowseAll(View):

@@ -16,7 +16,6 @@ from datafreezer.views import (
     BrowseSources,
     BrowseTags,
     BrowseVerticals,
-    data_dictionary_upload,
     DataDictionaryEditView,
     dataset_detail,
     download_data_dictionary,
@@ -28,6 +27,7 @@ from datafreezer.views import (
     tag_lookup,
     TagDetail,
     VerticalDetail,
+    # GenerateCreateTable,
 )
 
 urlpatterns = [
@@ -42,7 +42,7 @@ urlpatterns = [
     ),
     url(
         r'^upload/(?P<dataset_id>\d{1,})/$',
-        data_dictionary_upload,
+        DataDictionaryEditView.as_view(),
         name='datafreezer_datadict_upload'
     ),
     url(
@@ -130,9 +130,9 @@ urlpatterns = [
     ),
 
     # Generate create table statement
-    url(r'^create_table_sql/$',
-        GenerateCreateTable.as_view(),
-        name='datafreezer_create_table_sql'),
+    # url(r'^create_table_sql/$',
+    #     GenerateCreateTable.as_view(),
+    #     name='datafreezer_create_table_sql'),
 
     # JSON endpoints
     url(
