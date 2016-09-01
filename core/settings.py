@@ -10,8 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
+# Imports from python
 import os
+
+
+# Imports from other dependencies.
 import dj_database_url
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,6 +51,7 @@ INSTALLED_APPS = [
 
     # apps
     'datafreezer',
+    'dynamic_formsets',
 ]
 
 MIDDLEWARE = [
@@ -97,16 +103,28 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': '.'.join([
+            'django.contrib.auth.password_validation',
+            'UserAttributeSimilarityValidator',
+        ]),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': '.'.join([
+            'django.contrib.auth.password_validation',
+            'MinimumLengthValidator',
+        ]),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': '.'.join([
+            'django.contrib.auth.password_validation',
+            'CommonPasswordValidator',
+        ]),
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': '.'.join([
+            'django.contrib.auth.password_validation',
+            'NumericPasswordValidator',
+        ]),
     },
 ]
 

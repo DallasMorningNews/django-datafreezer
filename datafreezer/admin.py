@@ -1,6 +1,15 @@
+# Imports from django.  # NOQA
 from django.contrib import admin
 
-from models import *
+
+# Imports from datafreezer.
+from datafreezer.models import (
+    Article,  # NOQA
+    DataDictionary,
+    DataDictionaryField,
+    Dataset,
+    Tag,
+)
 
 admin.site.register(Dataset)
 admin.site.register(Tag)

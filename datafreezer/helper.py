@@ -1,4 +1,13 @@
-from sqlalchemy import Integer, Unicode, Text, Date, DateTime, Time, Float
+# Imports from other dependencies.  # NOQA
+from sqlalchemy import (
+    Date,
+    DateTime,
+    Float,
+    Integer,
+    Text,
+    Time,
+    Unicode,
+)
 
 
 def get_db_type_from_text(typeString):
@@ -30,4 +39,8 @@ def get_connection_string(dialect):
     elif dialect == 'mysql':
         return 'mysql://'
     else:
-        raise ValueError('%s is not a dialect of SQL accepted by this app.' % (dialect))
+        raise ValueError(
+            '%s is not a dialect of SQL accepted by this app.' % (
+                dialect
+            )
+        )

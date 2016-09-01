@@ -1,80 +1,95 @@
 {% load staticfiles %}
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Datafreezer</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css" />
-    <link rel="stylesheet" type="text/css" href="{% static "datafreezer/css/styles.css" %}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <meta charset="utf-8">
+        <title>Datafreezer</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css" />
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css" />
+        <link rel="stylesheet" type="text/css" href="{% static "datafreezer/css/styles.css" %}" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Script libraries -->
-    <!-- jquery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-    <!-- jquery ui -->
-    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
-    <!-- bootstrap js -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-    <!-- jquery debouncing -->
-    <script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>
+        <!-- Script libraries -->
+        <!-- jquery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        <!-- jquery ui -->
+        <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+        <!-- bootstrap js -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <!-- jquery debouncing -->
+        <script src="http://benalman.com/code/projects/jquery-throttle-debounce/jquery.ba-throttle-debounce.js"></script>
+        <!-- FontAwesome -->
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css" /></link>
 
-  </head>
-  <body id="datafreezer-body">
+        {% block custom_head %}{% endblock custom_head %}
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="{% url 'datafreezer_home' %}">Datafreezer</a>
+    </head>
+    <body id="datafreezer-body">
+        <nav class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div id="logo-holder" class="top-bar-left">
+                    <a href="{% url 'datafreezer_home' %}">
+                        <img class="masthead" src="{% static "datafreezer/img/dmn_masthead.svg" %}" alt="The Dallas Morning News">
+                        <img class="datafreezer-wordmark" src="{% static "datafreezer/img/datafreezer_logo.svg" %}" alt="DataFreezer">
+                    </a>
+                </div>
+
+                <div id="links-user-info-holder" class="top-bar-right">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            <li><a href="{% url 'datafreezer_upload' %}">Upload</a></li>
+                            <li class="divider">&nbsp;&thinsp;|&thinsp;&nbsp;</li>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Browse&nbsp;<span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'datafreezer_browse_all' %}"><span class="visible-xs-inline">Browse </span>All Uploads</a></li>
+                                    <li><a href="{% url 'datafreezer_browse_authors' %}"><span class="visible-xs-inline">Browse </span>Authors</a></li>
+                                    <li><a href="{% url 'datafreezer_browse_tags' %}"><span class="visible-xs-inline">Browse </span>Tags</a></li>
+                                    <li><a href="{% url 'datafreezer_browse_hubs' %}"><span class="visible-xs-inline">Browse </span>Hubs</a></li>
+                                    <li><a href="{% url 'datafreezer_browse_verticals' %}"><span class="visible-xs-inline">Browse </span>Verticals</a></li>
+                                    <li><a href="{% url 'datafreezer_browse_sources' %}"><span class="visible-xs-inline">Browse </span>Sources</a></li>
+                                </ul>
+                            </li>
+                            <li class="divider">&nbsp;&thinsp;|&thinsp;&nbsp;</li>
+                            <li class="current-user"><i class="fa fa-lock neon"></i> {{ request.user.email }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        {% block pre_main_content %}{% endblock pre_main_content %}
+
+        <div id="main" class="container-fluid">
+            <div class="content-inner">
+                {% block heading %}
+                <div id="header" class="page-header">
+                    <h2>{% block title %}{% endblock title %}</h2>
+                </div>
+                {% endblock heading %}
+
+                {% block content %}
+                    {% block no_results_msg %}
+                <div class="jumbotron">
+                    <div class="container">
+                        <h3 class="display-3">There's nothing here yet!</h3>
+                        <p class="lead">Datasets uploaded via the <a href="{% url 'datafreezer_upload' %}">Upload</a> tab in the navigation bar will be displayed on the homepage and under the <a href="#">Browse</a> tabs.</p>
+                    </div>
+                </div>
+                    {% endblock no_results_msg %}
+                {% endblock content %}
+            </div>
         </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav">
-            <li><a href="{% url 'datafreezer_upload' %}">Upload</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button">Browse<span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="{% url 'datafreezer_browse_all' %}">All Uploads</a></li>
-                <li><a href="{% url 'datafreezer_browse_authors' %}">Authors</a></li>
-                <li><a href="{% url 'datafreezer_browse_tags' %}">Tags</a></li>
-								<li><a href="{% url 'datafreezer_browse_hubs' %}">Hubs</a></li>
-								<li><a href="{% url 'datafreezer_browse_verticals' %}">Verticals</a></li>
-                <li><a href="{% url 'datafreezer_browse_sources' %}">Sources</a></li>
-              </ul>
-            </li>
-            <li><a href="#">Return to ???</a></li>
-          </ul>
-          <p id="loginText" class="navbar-text navbar-right">Signed in as {{ request.user.email }}</p>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container -->
-    </nav>
+        {% block post_main_content %}{% endblock post_main_content %}
 
-
-    <div id="main" class="container-fluid">
-      <div class="container-fluid">
-				{% block heading %}
-        <div id="header" class="page-header">
-          <h2>
-            {% block title %}
-            {% endblock title %}
-          </h2>
-        </div>
-				{% endblock heading %}
-        {% block content %}
-          {% block no_results_msg %}
-            <div class="jumbotron">
-              <div class="container">
-                <h3 class="display-3">There's nothing here yet!</h3>
-                <p class="lead">Datasets uploaded via the <a href="{% url 'datafreezer_upload' %}">Upload</a> tab in the navigation bar
-                  will be displayed on the homepage and under the <a href="#">Browse</a> tabs.</p>
-              </div>
-            {% endblock no_results_msg %}
-        {% endblock content %}
-      </div>
-    </div>
-
-
-    {% block scripts %}{% endblock %}
-  </body>
+        {% block scripts %}{% endblock %}
+    </body>
 </html>
