@@ -11,7 +11,6 @@ django-dynamic-formsets==0.0.8
 django-storages==1.5.0
 Django==1.10              # via django-formset-js, django-jquery-js
 gunicorn==19.6.0
-MySQL-python==1.2.5
 oauthlib==1.1.2
 psycopg2==2.6.2
 requests==2.11.0

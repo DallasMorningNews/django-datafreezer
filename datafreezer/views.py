@@ -73,16 +73,17 @@ from datafreezer.models import (
 # Imports from other dependencies.
 from bs4 import BeautifulSoup
 import requests
-from sqlalchemy import (
-    Column,
-    create_engine,
-    # Integer,
-    MetaData,
-    Table,
-    # Text,
-    # Unicode,
-)
-from sqlalchemy.schema import CreateTable
+# Create Table SQL TK
+# from sqlalchemy import (
+#     Column,
+#     create_engine,
+#     # Integer,
+#     MetaData,
+#     Table,
+#     # Text,
+#     # Unicode,
+# )
+# from sqlalchemy.schema import CreateTable
 
 
 def map_hubs_to_verticals():
