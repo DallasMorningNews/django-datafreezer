@@ -12,6 +12,7 @@ from django.utils import timezone
 
 # Imports from datafreezer.
 # from datafreezer.apps import BASE_DIR
+from datafreezer.storages import DATAFREEZER_STORAGE
 
 
 def create_col_nums():
@@ -120,7 +121,11 @@ class DataDictionary(models.Model):
     notes = models.TextField(blank=True, null=True)
 
     # No need for fields if we have an actual data dictionary document
-    attachments = models.FileField(blank=True, null=True)
+    attachments = models.FileField(
+        blank=True,
+        null=True,
+        storage=DATAFREEZER_STORAGE,
+    )
 
     def __unicode__(self):
         return '{}\'s dictionary'.format(self.author)
@@ -231,10 +236,18 @@ class Dataset(models.Model):
     tags = models.ManyToManyField(Tag)
     appears_in = models.ManyToManyField(Article, blank=True)
     data_dictionary = models.OneToOneField(DataDictionary, null=True)
-    dataset_file = models.FileField(max_length=500, upload_to='%Y/%m/%d/')
+    dataset_file = models.FileField(
+        max_length=500,
+        upload_to='%Y/%m/%d/',
+        storage=DATAFREEZER_STORAGE,
+    )
 
     # zip it up
-    attachments = models.FileField(blank=True, null=True)
+    attachments = models.FileField(
+        blank=True,
+        null=True,
+        storage=DATAFREEZER_STORAGE,
+    )
 
     # could_parse = models.NullBooleanField(blank=True, null=True)
     has_headers = models.BooleanField()
