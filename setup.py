@@ -13,7 +13,7 @@ DESCRIPTION = 'Data storage Django web application.'
 
 REPO_URL = 'https://github.com/dallasmorningnews/django-datafreezer'
 
-VERSION = '0.1.5'
+VERSION = '0.1.6'
 
 
 def read(fname):

@@ -10,6 +10,14 @@ and this project will (likely) adhere to [Semantic Versioning](http://semver.org
 -   (Nothing yet)
 
 
+
+## 0.1.6 - 2016-09-07
+
+### Changed
+-   Storage class no longer refers to boto (or django-storages) directly. Users can create such a storage class on their own implementations if desired.
+-   As a result of this change, Datafreezer now uses only one optional storage-related setting, `DATAFREEZER_CUSTOM_STORAGE_CLASS`. In the previous version there were four optional storage-related settings to decide between.
+
+
 ## 0.1.5 - 2016-09-06
 
 ### Added
