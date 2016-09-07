@@ -14,6 +14,7 @@ import json
 # )
 # from django.core.mail import send_mail, EmailMultiAlternatives
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import (
     EmptyPage,  # NOQA
     PageNotAnInteger,
@@ -444,7 +445,7 @@ def edit_dataset_metadata(request, dataset_id=None):
         )
 
 
-class DataDictionaryEditView(View):
+class DataDictionaryEditView(LoginRequiredMixin, View):
     """Edit/create view for each dataset's data dictionary."""
     def get(self, request, dataset_id):
         active_dataset = get_object_or_404(Dataset, pk=dataset_id)
