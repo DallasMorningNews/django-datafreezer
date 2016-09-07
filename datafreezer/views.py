@@ -236,7 +236,7 @@ def add_dataset(request, dataset_id=None):
                     dataset_metadata.tags.add(tagToAdd)
 
         return redirect(
-            'datafreezer_datadict_upload',
+            'datafreezer_datadict_edit',
             dataset_id=dataset_metadata.id
         )
 
