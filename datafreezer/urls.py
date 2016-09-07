@@ -41,11 +41,6 @@ urlpatterns = [
         name='datafreezer_upload'
     ),
     url(
-        r'^upload/(?P<dataset_id>\d{1,})/$',
-        DataDictionaryEditView.as_view(),
-        name='datafreezer_datadict_upload'
-    ),
-    url(
         r'^edit/(?P<dataset_id>\d+)/change-dictionary/$',
         DataDictionaryEditView.as_view(),
         name='datafreezer_datadict_edit'
