@@ -2,8 +2,9 @@
 from setuptools import setup, find_packages  # NOQA
 import os
 
-from pip.req import parse_requirements
 from pip.download import PipSession
+from pip.req import parse_requirements
+
 
 REQS_RAW = parse_requirements('./requirements.txt', session=PipSession())
 
