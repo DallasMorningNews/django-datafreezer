@@ -2,8 +2,9 @@
 from setuptools import setup, find_packages  # NOQA
 import os
 
-from pip.req import parse_requirements
 from pip.download import PipSession
+from pip.req import parse_requirements
+
 
 REQS_RAW = parse_requirements('./requirements.txt', session=PipSession())
 
@@ -13,7 +14,7 @@ DESCRIPTION = 'Data storage Django web application.'
 
 REPO_URL = 'https://github.com/dallasmorningnews/django-datafreezer'
 
-VERSION = '0.1.6'
+VERSION = '0.2.0'
 
 
 def read(fname):

@@ -4,10 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project will (likely) adhere to [Semantic Versioning](http://semver.org/).
 
+
+
 ## [Unreleased]
 
 ### Changed
--   (Nothing yet)
+-   (None yet)
+
+
+
+## 0.2.0 - 2016-09-09
+
+### Added
+-   Added non-admin-specific login & logout pages for users.
+-   Added more blocks to the base template, including one to populate the `{{ title }}` tag.
+
+### Changed
+-   Implemented more accurate semantic versioning.
+-   Modified URL structure for dataset creating/editing/detail pages:
+    *    `/datasets/create/` now enables users to create a new dataset.
+    *    `/datasets/FOO/` now shows the dataset's detail page.
+    *    `/datasets/FOO/change-dataset/` now enables users to edit a dataset's metadata.
+    *    `/datasets/FOO/change-dictionary/` now enables users to edit a dataset's data dictionary.
+-   Restricted upload and editing views to authenticated users.
+-   Tailored options in sitewide title bar depending on whether users are authenticated.
 
 
 
@@ -16,6 +36,7 @@ and this project will (likely) adhere to [Semantic Versioning](http://semver.org
 ### Changed
 -   Storage class no longer refers to boto (or django-storages) directly. Users can create such a storage class on their own implementations if desired.
 -   As a result of this change, Datafreezer now uses only one optional storage-related setting, `DATAFREEZER_CUSTOM_STORAGE_CLASS`. In the previous version there were four optional storage-related settings to decide between.
+
 
 
 ## 0.1.5 - 2016-09-06

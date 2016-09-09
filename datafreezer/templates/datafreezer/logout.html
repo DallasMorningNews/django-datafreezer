@@ -1,0 +1,68 @@
+{% extends 'datafreezer/base.html' %}
+
+
+{% load static %}
+
+
+{% block page_title %}Logged out | {{ block.super }}{% endblock page_title %}
+
+
+{% block custom_head %}
+    {{ block.super }}
+    <!-- <link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" /> -->
+    <style type="text/css">
+        .logout > .datafreezer-logo-dark {
+            margin: 5rem auto 3.5rem;
+            max-width: 500px;
+        }
+
+        .logout > .datafreezer-logo-dark > img {
+            opacity: 0.65;
+            width: 100%;
+        }
+
+        .logout > #main {
+            margin-top: 4.5rem;
+            width: 27rem;
+        }
+
+        .logout > #main > .content-inner {
+            background-color: #FFFFFF;
+        }
+
+        .logout > #main > .content-inner > #content-main {
+            background: #FFFFFF;
+            padding: 0.75rem 0 1rem;
+        }
+
+        .logout > #main > .content-inner > #content-main .logout-text {
+            margin: 0;
+            padding: 0.75rem 1.5rem;
+        }
+    </style>
+    {{ form.media }}
+{% endblock %}
+
+
+{% block bodyclass %}logout{% endblock %}
+
+
+{% block navigation %}{% endblock %}
+
+
+{% block title %}You've been logged out.{% endblock title %}
+
+
+{% block pre_main_content %}
+    <div class="datafreezer-logo-dark">
+        <img src="{% static "datafreezer/img/datafreezer_logo_dark.svg" %}" alt="DataFreezer" />
+    </div>
+{% endblock pre_main_content %}
+
+
+{% block content %}
+    <div id="content-main">
+        <p class="logout-text">Thanks for spending some quality time with the Web site today.</p>
+        <p class="logout-text"><a href="{% url 'datafreezer_login' %}">Log in again</a></p>
+    </div>
+{% endblock %}

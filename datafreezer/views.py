@@ -13,6 +13,8 @@ import json
 #     ValidationError,
 # )
 # from django.core.mail import send_mail, EmailMultiAlternatives
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import (
     EmptyPage,  # NOQA
     PageNotAnInteger,
@@ -86,6 +88,9 @@ import requests
 # from sqlalchemy.schema import CreateTable
 
 
+LOGIN_URL = '/login/'
+
+
 def map_hubs_to_verticals():
     """Return all verticals (sections) mapped to hubs (subsections).
 
@@ -102,6 +107,7 @@ def map_hubs_to_verticals():
             vertical_hub_map[vertical_slug]['hubs'].append(hub['slug'])
 
     return vertical_hub_map
+
 
 VERTICAL_HUB_MAP = map_hubs_to_verticals()
 
@@ -231,7 +237,7 @@ def add_dataset(request, dataset_id=None):
                     dataset_metadata.tags.add(tagToAdd)
 
         return redirect(
-            'datafreezer_datadict_upload',
+            'datafreezer_datadict_edit',
             dataset_id=dataset_metadata.id
         )
 
@@ -409,6 +415,7 @@ def home(request):
 
 
 # Upload a data set here
+@login_required(login_url=LOGIN_URL)
 def edit_dataset_metadata(request, dataset_id=None):
     """Renders a template to upload or edit a Dataset.
 
@@ -438,8 +445,10 @@ def edit_dataset_metadata(request, dataset_id=None):
         )
 
 
-class DataDictionaryEditView(View):
+class DataDictionaryEditView(LoginRequiredMixin, View):
     """Edit/create view for each dataset's data dictionary."""
+    login_url = LOGIN_URL
+
     def get(self, request, dataset_id):
         active_dataset = get_object_or_404(Dataset, pk=dataset_id)
 
