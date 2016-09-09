@@ -1,0 +1,234 @@
+{% extends 'datafreezer/base.html' %}
+
+
+{% load static %}
+
+
+{% block page_title %}Log in | {{ block.super }}{% endblock page_title %}
+
+
+{% block custom_head %}
+    {{ block.super }}
+    <!-- <link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}" /> -->
+    <style type="text/css">
+        .login > .datafreezer-logo-dark {
+            margin: 5rem auto 3.5rem;
+            max-width: 500px;
+        }
+
+        .login > .datafreezer-logo-dark > img {
+            opacity: 0.65;
+            width: 100%;
+        }
+
+        .login > #main {
+            margin-top: 4.5rem;
+            width: 27rem;
+        }
+        .login > #main > .content-inner {
+            background-color: #FFFFFF;
+        }
+        .login > #main > .content-inner .errornote {
+            background-color: #DBDBDB;
+            border: 1px solid;
+            border-top: 0 none;
+            border-color: transparent #9E9E9E #888;
+            margin: 0;
+            padding: 1rem 1.5rem;
+        }
+        .login > #main > .content-inner > #content-main {
+            background: #FFFFFF;
+        }
+
+        #login-form {
+            padding: 0.25rem 1.5rem 1.5rem;
+        }
+
+        #login-form > .form-spacer {
+            height: 0.01rem;
+        }
+
+        .login .form-row {
+            margin: 2.25rem 0 1rem 0;
+            padding: 0 0.625rem;
+            position: relative;
+        }
+        .login .form-row > input {
+            background: none;
+            border-color: transparent;
+            border-width: 0;
+            box-shadow: none;
+            color: transparent;
+            display: block;
+            font-size: 1rem;
+            line-height: 1.5rem;
+            height: 1.5rem;
+            margin: 0 0 3px;
+            padding: 0 0.125rem;
+            width: 100%;
+            transition: height 0s;
+        }
+
+        .login .form-row > input:focus,
+        .login .form-row > input:valid,
+        .login .form-row > input.has-value {
+            color: #333333;
+            outline: none;
+        }
+
+        .login .form-row > .control-label {
+            color: #9E9E9E;
+            font-size: 1rem;
+            font-weight: normal;
+            line-height: 1rem;
+            padding-left: 0.125rem;
+            pointer-events: none;
+            position: absolute;
+            top: 0.25rem;
+            z-index: 1;
+            transition: all 0.28s ease;
+        }
+
+        .login .form-row > input:focus ~ .control-label,
+        .login .form-row > input:valid ~ .control-label,
+        .login .form-row > input.has-value ~ .control-label {
+            color: #808080;
+            font-size: 0.75rem;
+            height: 1rem;
+            left: 0.625rem;
+            line-height: 1rem;
+            margin: 0 0 0.25rem;
+            top: -1.25rem;
+        }
+
+        .login .form-row > input:focus ~ .control-label .required-marker,
+        .login .form-row > input:valid ~ .control-label .required-marker,
+        .login .form-row > input.has-value ~ .control-label .required-marker {
+            margin-left: 0.08rem;
+        }
+
+        .login .form-row > .bar {
+            border-bottom: 0.0625rem solid #999;
+            display: block;
+            position: relative;
+        }
+
+        .login .form-row > .bar::before {
+            background: #0185D3;
+            bottom: calc(1rem / -16);
+            content: '';
+            height: calc(1rem / 8);
+            left: 50%;
+            position: absolute;
+            width: 0;
+            z-index: 2;
+
+            transition: left 0.28s ease, width 0.28s ease;
+        }
+
+        .login .form-row > select:focus ~ .control-label,
+        .login .form-row > input:focus ~ .control-label,
+        .login .form-row > textarea:focus ~ .control-label {
+            color: #0185D3;
+        }
+
+        .login .form-row > select:focus ~ .control-label .required-marker,
+        .login .form-row > input:focus ~ .control-label .required-marker,
+        .login .form-row > textarea:focus ~ .control-label .required-marker {
+            color: #D9534F;
+        }
+
+        .login .form-row > select:focus ~ .bar::before,
+        .login .form-row > input:focus ~ .bar::before,
+        .login .form-row > textarea:focus ~ .bar::before  {
+            left: 0;
+            width: 100%;
+        }
+
+
+        .login .form-row #id_username,
+        .login .form-row #id_password {
+            outline: none;
+        }
+
+        .login .submit-row {
+            padding: 2em 0 0;
+        }
+
+        .login .submit-row .btn {
+            font-size: 20px;
+            line-height: 34px;
+            outline: none;
+        }
+    </style>
+    {{ form.media }}
+{% endblock %}
+
+
+{% block bodyclass %}login{% endblock %}
+
+
+{% block navigation %}{% endblock %}
+
+
+{% block title %}Log in{% endblock title %}
+
+
+{% block pre_main_content %}
+    <div class="datafreezer-logo-dark">
+        <img src="{% static "datafreezer/img/datafreezer_logo_dark.svg" %}" alt="DataFreezer" />
+    </div>
+{% endblock pre_main_content %}
+
+
+{% block content %}
+    {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+    {% if form.errors.items|length == 1 %}Please correct the error below."{% else %}"Please correct the errors below.{% endif %}
+    </p>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+    <p class="errornote">
+        {{ error }}
+    </p>
+        {% endfor %}
+    {% endif %}
+
+    <div id="content-main">
+        {% if user.is_authenticated %}
+        <p class="errornote">You are authenticated as {{ username }}, but are not authorized to access this page. Would you like to login to a different account?</p>
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
+            <div class="form-row">
+                {{ form.username.errors }}
+                <input autofocus="" id="{{ form.username.id_for_label }}" maxlength="254" name="{{ form.username.html_name }}" type="text"{% if form.username.value %} value="{{ form.username.value }}"{% endif %} required="" autocomplete="off" />
+                <label for="{{ form.username.id_for_label }}" class="control-label">{{ form.username.label }}</label>
+                <i class="bar"></i>
+            </div>
+
+            <div class="form-spacer"></div>
+
+            <div class="form-row">
+                {{ form.password.errors }}
+                {{ form.password }}
+                <label for="{{ form.password.id_for_label }}" class="control-label">{{ form.password.label }}</label>
+                <i class="bar"></i>
+            </div>
+
+            <input type="hidden" name="next" value="{{ next }}" />
+
+        {% url 'admin_password_reset' as password_reset_url %}
+        {% if password_reset_url %}
+            <div class="password-reset-link">
+                <a href="{{ password_reset_url }}">Forgotten your password or username?</a>
+            </div>
+        {% endif %}
+            <div class="submit-row">
+                <input class="btn btn-primary btn-block" type="submit" value="Log in" />
+            </div>
+        </form>
+    </div>
+{% endblock %}
