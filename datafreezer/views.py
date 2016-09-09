@@ -447,6 +447,8 @@ def edit_dataset_metadata(request, dataset_id=None):
 
 class DataDictionaryEditView(LoginRequiredMixin, View):
     """Edit/create view for each dataset's data dictionary."""
+    login_url = LOGIN_URL
+
     def get(self, request, dataset_id):
         active_dataset = get_object_or_404(Dataset, pk=dataset_id)
 
