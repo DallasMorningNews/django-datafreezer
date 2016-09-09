@@ -4,6 +4,7 @@
 
 html,
 body {
+    display: block;
     height: 100%;
     font-size: 16px;
     width: 100%;
@@ -88,8 +89,13 @@ body {
     color: #FFFFFF;
 }
 
-.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user {
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user,
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.login-trigger {
     color: #FFFFFF;
+}
+
+.navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.login-trigger {
+    font-weight: 700;
 }
 
 .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li > a {
@@ -160,6 +166,7 @@ body {
         border-bottom-left-radius: 2px;
         border-bottom-right-radius: 2px;
         box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        max-height: 400px;
         padding: 0;
         position: absolute;
         right: 1.5rem;
@@ -186,7 +193,9 @@ body {
     }
 
     .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user,
-    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user:hover {
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.login-trigger,
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user:hover,
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.login-trigger:hover {
         background-color: #455A64;
         border-bottom-left-radius: 2px;
         border-bottom-right-radius: 2px;
@@ -205,6 +214,24 @@ body {
     .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li > a {}
 
     .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > a {
+        display: none;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user > a {
+        background: rgba(0,0,0,0.18);
+        display: block;
+        height: 2.4rem;
+        line-height: 2.4rem;
+        margin: 0;
+        padding: 0 0.75rem;
+        pointer-events: none;
+    }
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user:hover,
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user > a:hover {
+        background-color: #455A64;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user > a > .caret {
         display: none;
     }
 
@@ -229,6 +256,10 @@ body {
 
     .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu > li:hover {
         background-color: #2E7F7F;
+    }
+
+    .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.current-user > .dropdown-menu > li:hover {
+        background-color: #466670;
     }
 
     .navbar > .navbar-inner > #links-user-info-holder > .navbar-collapse > .navbar-nav > li.dropdown > .dropdown-menu > li > a {
