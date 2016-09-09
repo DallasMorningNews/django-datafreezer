@@ -8,8 +8,16 @@ and this project will (likely) adhere to [Semantic Versioning](http://semver.org
 
 ## [Unreleased]
 
+### Changed
+-   (None yet)
+
+
+
+## 0.2.0 - 2016-09-09
+
 ### Added
--   Added a non-admin-specific login page for users. (STILL TODO as of Sept. 7)
+-   Added non-admin-specific login & logout pages for users.
+-   Added more blocks to the base template, including one to populate the `{{ title }}` tag.
 
 ### Changed
 -   Implemented more accurate semantic versioning.
@@ -19,7 +27,7 @@ and this project will (likely) adhere to [Semantic Versioning](http://semver.org
     *    `/datasets/FOO/change-dataset/` now enables users to edit a dataset's metadata.
     *    `/datasets/FOO/change-dictionary/` now enables users to edit a dataset's data dictionary.
 -   Restricted upload and editing views to authenticated users.
--   Improved handling of unauthenticated uses in sitewide title bar.
+-   Tailored options in sitewide title bar depending on whether users are authenticated.
 
 
 
