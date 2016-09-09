@@ -4,7 +4,8 @@ from django.conf.urls import (
     # include,
     url,  # NOQA
 )
-from django.views.generic.base import RedirectView
+# from django.urls import reverse
+# from django.views.generic.base import RedirectView
 # from django.views.static import serve
 
 
@@ -30,6 +31,15 @@ from datafreezer.views import (
     VerticalDetail,
     # GenerateCreateTable,
 )
+
+
+# django.contrib.auth.views.LoginView will be added in Django 1.11.
+# Until then, load a version of the same from our own code instead.
+try:
+    from django.contrib.auth.views import LoginView, LogoutView  # NOQA
+except ImportError:
+    from datafreezer.views_compat import LoginView, LogoutView  # NOQA
+
 
 urlpatterns = [
     # Home page.
@@ -153,6 +163,30 @@ urlpatterns = [
         r'^datasets/(?P<dataset_id>\d+)/change-dictionary/$',
         DataDictionaryEditView.as_view(),
         name='datafreezer_datadict_edit'
+    ),
+
+
+
+    # ##################### #
+    # Authentication views. #
+    # ##################### #
+
+    # Login form.
+    url(
+        r'^login/$',
+        LoginView.as_view(
+            success_url='/',
+            template_name='datafreezer/login.html'
+        ),
+        name='datafreezer_login',
+    ),
+
+    url(
+        r'^logout/$',
+        LogoutView.as_view(
+            template_name='datafreezer/logout.html'
+        ),
+        name='datafreezer_logout'
     ),
 
 
